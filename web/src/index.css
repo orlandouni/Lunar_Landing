@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  font-family: Inter, system-ui, sans-serif;
+  color: #dbe4f3;
+  background:
+    radial-gradient(ellipse at top, rgba(78, 168, 255, 0.08), transparent 60%),
+    #04070d;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-xl border border-space-700 bg-space-900/80 p-4 shadow-lg shadow-black/40;
+  }
+  .panel-title {
+    @apply mb-3 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-slate-400;
+  }
+  .btn {
+    @apply rounded-md border border-space-600 px-3 py-1.5 text-sm transition hover:border-earth/60 hover:text-white;
+  }
+  .btn-on {
+    @apply border-earth bg-earth/15 text-white;
+  }
+}
+
+input[type='range'] {
+  accent-color: #4ea8ff;
+}

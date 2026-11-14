@@ -1,0 +1,1 @@
+Aquí van los JSON reales: copia data-pipeline/public/* en esta carpeta (sites.json, summary.json, samples/<id>.json).
