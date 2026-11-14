@@ -112,7 +112,8 @@ def main():
     for s in sites:
         data = {}
         for name, code in BODIES.items():
-            f = raw_dir / f"{s['id']}_{name}_{tag}.txt"
+            # la caché incluye las coordenadas: si se mueve el punto, se vuelve a consultar
+            f = raw_dir / f"{s['id']}_{s['lat']:.4f}_{s['lon']:.4f}_{name}_{tag}.txt"
             if not f.exists():
                 print(f"Horizons: {s['name']} / {name} {args.start} -> {args.stop}")
                 f.write_text(fetch(s, code, args.start, args.stop, args.step), encoding="utf-8")

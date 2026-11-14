@@ -1,14 +1,95 @@
 {
-  "_nota": "Puntos representativos APROXIMADOS. NASA publica las 9 regiones candidatas Artemis solo como zonas en un mapa (NASA, 28-oct-2024; LPSC 2026 NTRS 20250011660), sin coordenadas de centro. Cada punto se derivó de la feature IAU más cercana (USGS Gazetteer of Planetary Nomenclature). Refinar en LROC QuickMap si hay tiempo. lon = grados Este (-180..180).",
+  "_nota": "lat0/lon0: punto original aproximado (feature IAU más cercana; NASA publica las regiones Artemis sin coordenadas de centro). lat/lon: punto elegido por best_point.py. lon = grados Este (-180..180).",
   "sites": [
-    {"id": "peak-near-cabeus-b", "name": "Peak near Cabeus B", "lat": -84.10, "lon": -55.00, "basis": "PENDIENTE: estimado cerca del cráter Cabeus B; verificar en QuickMap"},
-    {"id": "haworth", "name": "Haworth", "lat": -86.90, "lon": -4.00, "basis": "centro del cráter Haworth (Wikipedia 86.9S 4.0W)"},
-    {"id": "malapert-massif", "name": "Malapert Massif", "lat": -85.99, "lon": 2.93, "basis": "cima del macizo Malapert (al sur del cráter Malapert, Gazetteer 3603: -84.90, 12.90)"},
-    {"id": "mons-mouton-plateau", "name": "Mons Mouton Plateau", "lat": -85.40, "lon": 31.50, "basis": "meseta en la cima de Mons Mouton (estimado)"},
-    {"id": "mons-mouton", "name": "Mons Mouton", "lat": -84.60, "lon": 31.00, "basis": "Gazetteer 16070: -84.60, 31.00"},
-    {"id": "nobile-rim-1", "name": "Nobile Rim 1", "lat": -86.45, "lon": 53.27, "basis": "PENDIENTE: estimado mal ubicado; en Moon Trek queda junto a Leibnitz Beta Plateau. Cráter Nobile, Gazetteer 4321: -85.28, 53.27"},
-    {"id": "nobile-rim-2", "name": "Nobile Rim 2", "lat": -85.00, "lon": 68.00, "basis": "borde este del cráter Nobile (estimado)"},
-    {"id": "de-gerlache-rim-2", "name": "de Gerlache Rim 2", "lat": -88.20, "lon": -66.00, "basis": "borde del cráter de Gerlache, Gazetteer 1439: -88.50, -87.10, D=32 km (estimado)"},
-    {"id": "slater-plain", "name": "Slater Plain", "lat": -88.08, "lon": 111.29, "basis": "cráter Slater (Wikipedia 88.08S 111.29E)"}
+    {
+      "id": "peak-near-cabeus-b",
+      "name": "Peak near Cabeus B",
+      "lat": -83.9938,
+      "lon": -54.1175,
+      "basis": "PENDIENTE: estimado cerca del cráter Cabeus B; verificar en QuickMap",
+      "lat0": -84.1,
+      "lon0": -55.0,
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+    },
+    {
+      "id": "haworth",
+      "name": "Haworth",
+      "lat": -86.7813,
+      "lon": -3.7651,
+      "basis": "centro del cráter Haworth (Wikipedia 86.9S 4.0W)",
+      "lat0": -86.9,
+      "lon0": -4.0,
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+    },
+    {
+      "id": "malapert-massif",
+      "name": "Malapert Massif",
+      "lat": -85.9758,
+      "lon": 1.6141,
+      "basis": "cima del macizo Malapert (al sur del cráter Malapert, Gazetteer 3603: -84.90, 12.90)",
+      "lat0": -85.99,
+      "lon0": 2.93,
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+    },
+    {
+      "id": "mons-mouton-plateau",
+      "name": "Mons Mouton Plateau",
+      "lat": -85.4,
+      "lon": 31.6645,
+      "basis": "meseta en la cima de Mons Mouton (estimado)",
+      "lat0": -85.4,
+      "lon0": 31.5,
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+    },
+    {
+      "id": "mons-mouton",
+      "name": "Mons Mouton",
+      "lat": -84.3358,
+      "lon": 31.6683,
+      "basis": "Gazetteer 16070: -84.60, 31.00",
+      "lat0": -84.6,
+      "lon0": 31.0,
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+    },
+    {
+      "id": "nobile-rim-1",
+      "name": "Nobile Rim 1",
+      "lat": -86.6799,
+      "lon": 49.395,
+      "basis": "PENDIENTE: estimado mal ubicado; en Moon Trek queda junto a Leibnitz Beta Plateau. Cráter Nobile, Gazetteer 4321: -85.28, 53.27",
+      "lat0": -86.45,
+      "lon0": 53.27,
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+    },
+    {
+      "id": "nobile-rim-2",
+      "name": "Nobile Rim 2",
+      "lat": -84.8279,
+      "lon": 68.878,
+      "basis": "borde este del cráter Nobile (estimado)",
+      "lat0": -85.0,
+      "lon0": 68.0,
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+    },
+    {
+      "id": "de-gerlache-rim-2",
+      "name": "de Gerlache Rim 2",
+      "lat": -88.5156,
+      "lon": -68.0374,
+      "basis": "borde del cráter de Gerlache, Gazetteer 1439: -88.50, -87.10, D=32 km (estimado)",
+      "lat0": -88.2,
+      "lon0": -66.0,
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+    },
+    {
+      "id": "slater-plain",
+      "name": "Slater Plain",
+      "lat": -87.7634,
+      "lon": 111.628,
+      "basis": "cráter Slater (Wikipedia 88.08S 111.29E)",
+      "lat0": -88.08,
+      "lon0": 111.29,
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+    }
   ]
 }

@@ -10,27 +10,29 @@ body,
 
 body {
   font-family: Inter, system-ui, sans-serif;
-  color: #dbe4f3;
-  background:
-    radial-gradient(ellipse at top, rgba(78, 168, 255, 0.08), transparent 60%),
-    #04070d;
+  color: #c6cedb;
+  background: #05070b;
 }
 
 @layer components {
+  /* superficie de vidrio sobre la escena 3D */
+  .glass {
+    @apply rounded-2xl border border-white/[0.06] bg-[#111824]/60 shadow-xl shadow-black/30 backdrop-blur-xl;
+  }
   .panel {
-    @apply rounded-xl border border-space-700 bg-space-900/80 p-4 shadow-lg shadow-black/40;
+    @apply rounded-2xl border border-white/[0.05] bg-[#111824]/70 p-4;
   }
   .panel-title {
-    @apply mb-3 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-slate-400;
+    @apply mb-3 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400;
   }
   .btn {
-    @apply rounded-md border border-space-600 px-3 py-1.5 text-sm transition hover:border-earth/60 hover:text-white;
+    @apply rounded-lg border border-white/10 px-3 py-1.5 text-sm text-slate-300 transition hover:border-white/20 hover:text-slate-100;
   }
   .btn-on {
-    @apply border-earth bg-earth/15 text-white;
+    @apply border-white/20 bg-white/10 text-slate-100;
   }
 }
 
 input[type='range'] {
-  accent-color: #4ea8ff;
+  accent-color: #7ea6d8;
 }

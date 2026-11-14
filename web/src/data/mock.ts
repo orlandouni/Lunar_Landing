@@ -74,5 +74,5 @@ export function buildMockDataset(): Dataset {
   }))
   const samples: Record<string, Sample[]> = {}
   for (const s of sites) samples[s.id] = mockSamples(s)
-  return { source: 'mock', sites, samples, times: samples[sites[0].id].map((x) => x.t) }
+  return { source: 'mock', terrain: null, sites, samples, times: samples[sites[0].id].map((x) => x.t) }
 }

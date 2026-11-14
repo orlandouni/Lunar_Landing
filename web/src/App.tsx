@@ -1,13 +1,83 @@
 import { useEffect, useState } from 'react'
-import { Comparator } from './components/Comparator'
-import { Header } from './components/Header'
-import { HorizonView } from './components/HorizonView'
-import { PolarMap } from './components/PolarMap'
-import { SiteMetrics } from './components/SiteMetrics'
+import { MoonCanvas, type View } from './components/Globe3D'
+import { BestNow } from './components/BestNow'
+import { ComparePage, MetricsPage } from './components/Pages'
+import { SiteCard } from './components/SiteCard'
+import { SiteList } from './components/SiteList'
 import { Timeline } from './components/Timeline'
+import { TopBar } from './components/TopBar'
 import { loadDataset } from './data/loader'
-import { AppProvider } from './store'
+import { AppProvider, useApp } from './store'
 import type { Dataset } from './types'
+
+/** Botones de cámara (abajo a la derecha, sobre la línea de tiempo) */
+function CameraButtons({ view, go }: { view: View; go: (v: View) => void }) {
+  const { t, focus } = useApp()
+  const items: { id: View; label: string; show: boolean }[] = [
+    { id: 'moon', label: t('viewMoon'), show: true },
+    { id: 'pole', label: t('viewPole'), show: true },
+    { id: 'site', label: t('viewSite'), show: focus },
+  ]
+  return (
+    <div className="glass pointer-events-auto absolute bottom-36 right-4 z-20 flex flex-col p-1">
+      {items
+        .filter((x) => x.show)
+        .map((x) => (
+          <button
+            key={x.id}
+            onClick={() => go(x.id)}
+            className={`rounded-xl px-3 py-1.5 text-xs transition ${view === x.id ? 'bg-white/15 text-slate-100' : 'text-slate-100/55 hover:text-slate-100'}`}
+          >
+            {x.label}
+          </button>
+        ))}
+    </div>
+  )
+}
+
+function Shell() {
+  const { tab, focus, site, mode, t } = useApp()
+  const [view, setView] = useState<View>(() => {
+    const v = new URLSearchParams(window.location.hash.slice(1)).get('view')
+    return v === 'site' || v === 'pole' ? v : 'moon'
+  })
+  const [nonce, setNonce] = useState(0)
+  const [hover, setHover] = useState<string | null>(null)
+  const go = (v: View) => {
+    setView(v)
+    setNonce((n) => n + 1)
+  }
+
+  // Al elegir un sitio, volar hacia él
+  useEffect(() => {
+    if (focus) go('site')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [site.id, focus])
+
+  return (
+    <div className="fixed inset-0 overflow-hidden bg-black">
+      {/* isolate: las etiquetas 3D no pueden quedar encima de las hojas de Métricas/Comparar */}
+      <div className="absolute inset-0 isolate">
+        <MoonCanvas view={view} nonce={nonce} hover={hover} setHover={setHover} />
+      </div>
+      <TopBar />
+      {tab === 'explore' && (
+        <>
+          <BestNow />
+          <SiteList hover={hover} setHover={setHover} />
+          <SiteCard />
+          <CameraButtons view={view} go={go} />
+          {mode === 'class' && (
+            <p className="glass pointer-events-none absolute bottom-36 left-4 z-20 max-w-md p-3 text-sm leading-relaxed text-amber-100/90">{t('explainGlobe')}</p>
+          )}
+        </>
+      )}
+      {tab === 'metrics' && <MetricsPage />}
+      {tab === 'compare' && <ComparePage />}
+      <Timeline />
+    </div>
+  )
+}
 
 export default function App() {
   const [data, setData] = useState<Dataset | null>(null)
@@ -18,22 +88,16 @@ export default function App() {
   }, [])
 
   if (error) return <div className="p-8 font-mono text-red-400">Error: {error}</div>
-  if (!data) return <div className="p-8 font-mono text-slate-400">Cargando efemérides… / Loading ephemerides…</div>
+  if (!data)
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black font-mono text-sm tracking-widest text-slate-100/50">
+        HORIZONTE SUR · cargando la Luna…
+      </div>
+    )
 
   return (
     <AppProvider data={data}>
-      <div className="mx-auto flex max-w-[1500px] flex-col gap-4 p-4">
-        <Header />
-        <div className="grid gap-4 lg:grid-cols-[minmax(300px,1fr)_minmax(0,2fr)]">
-          <PolarMap />
-          <div className="flex min-w-0 flex-col gap-4">
-            <HorizonView />
-            <SiteMetrics />
-          </div>
-        </div>
-        <Timeline />
-        <Comparator />
-      </div>
+      <Shell />
     </AppProvider>
   )
 }

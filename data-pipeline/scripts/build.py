@@ -57,8 +57,10 @@ def main():
         if not h:
             print(f"AVISO: {s['id']} sin horizonte del DEM; se usa horizonte plano (0°)")
         out_sites.append({"id": s["id"], "name": s["name"], "lat": s["lat"], "lon": s["lon"],
-                          "elevM": h["elev_m"] if h else None, "horizon": horizon,
-                          "horizonSource": "LOLA DEM" if h else "flat"})
+                          "elevM": h["elev_m"] if h else None, "slopeDeg": h.get("slope_deg") if h else None,
+                          "horizon": horizon,
+                          "horizonSource": "LOLA DEM" if h else "flat",
+                          **({"lat0": s["lat0"], "lon0": s["lon0"]} if "lat0" in s else {})})
         f = DATA / "samples" / f"{s['id']}.json"
         if not f.exists():
             print(f"AVISO: faltan efemérides de {s['id']}")

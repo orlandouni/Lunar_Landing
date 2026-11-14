@@ -23,6 +23,7 @@ Las respuestas de Horizons se guardan en `raw/horizons/`, así que si se corta s
 |---|---|
 | `sites.json` | `Site[]` = `{id, name, lat, lon, elevM, horizon: number[360], horizonSource}` |
 | `samples/<id>.json` | `Sample[]` = `{t, sunAz, sunEl, earthAz, earthEl}` (t ISO UTC, horario) |
+| `terrain/height.bin` + `meta.json` | Relieve LOLA del polo sur para el globo 3D: Int16 N×N (metros sobre R), promedio por bloques del DEM (`terrain.py`, 1024² ≈ 594 m/celda) |
 | `summary.json` | por sitio: `total` y `months["2028-01"]` con `sunPct, earthPct, bothPct, sunHours, earthHours, bothHours, longestDarkHours, longestNoCommHours` |
 
 Convenciones: azimut en grados desde el Norte lunar hacia el Este (0 a 360), elevación en grados sobre el horizonte matemático local. `horizon[i]` es la elevación angular máxima del terreno en el azimut `i`.
@@ -32,6 +33,8 @@ Regla de visibilidad: `visible = el > horizon[Math.round(az) % 360]`. Se evalúa
 ## Método
 
 1. **Efemérides** (`fetch_horizons.py`): JPL Horizons API, `EPHEM_TYPE=OBSERVER`, `COMMAND` = 10 (Sol) y 399 (Tierra), `CENTER=coord@301`, `COORD_TYPE=GEODETIC`, `SITE_COORD` = lon E, lat, 0 km, `QUANTITIES=4` (azimut/elevación aparentes), `APPARENT=AIRLESS`, paso de 1 h, del 2028-01-01 al 2029-01-01 UTC.
+1b. **Mejor punto por región** (`best_point.py`, opcional con `run_all.py --search`): NASA publica las regiones Artemis sin coordenadas de centro. Para cada sitio se prueba una malla cada 400 m en un radio de 10 km alrededor del punto original (`lat0/lon0` en `sites.json`) y se elige el de más horas con Sol y Tierra a la vez en 2028, con pendiente ≤ 8° (plano ajustado al DEM en ±160 m). Usa un horizonte rápido de 180 azimuts; después `horizon.py` y `build.py` recalculan todo con precisión en el punto elegido, y las cifras coinciden con la búsqueda en ±1 punto porcentual.
+
 2. **Horizonte** (`horizon.py`): para cada uno de 360 azimuts recorre el círculo máximo desde el sitio hasta 150 km sobre el DEM LOLA (interpolación bilineal), con observador a 2 m del suelo. La curvatura lunar se trata de forma exacta: `el = atan2((R+h)·cos θ − (R+h₀), (R+h)·sin θ)`, con `θ = d/R` y `R = 1737.4 km`. Se probó con un DEM sintético: una montaña de 5 km a 50 km da 4.85° frente a 4.88° teóricos.
 3. **Métricas** (`build.py`): porcentaje de horas con Sol, con Tierra y con ambos, más la noche más larga y el apagón de comunicaciones más largo, por mes y total.
 

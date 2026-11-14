@@ -8,7 +8,7 @@ angular. La curvatura lunar se trata de forma exacta en geometría esférica:
 
 Uso:
   python horizon.py --dem ruta/al/DEM.tif [--max-km 150] [--obs-height 2]
-Salida: horizons.json -> {site_id: {"elev_m": h, "horizon": [360 floats]}}
+Salida: horizons.json -> {site_id: {"elev_m": h, "slope_deg": s, "horizon": [360 floats]}}
 """
 import argparse
 import json
@@ -83,6 +83,20 @@ def horizon_for(dem, lat, lon, max_km, obs_h, n_az=360):
     return h0, hz
 
 
+def slope_deg(dem, lat, lon, half=160.0, n=5):
+    """Pendiente (°) del plano que mejor ajusta el terreno en un cuadrado de 2·half m
+    centrado en el punto (≈ huella del módulo + margen). Usa coordenadas de la proyección,
+    casi conforme cerca del polo (factor de escala < 1.002 a 80°S)."""
+    x0, y0 = dem.tf.transform(lon, lat)
+    g = np.linspace(-half, half, n)
+    dx, dy = np.meshgrid(g, g)
+    lon_s, lat_s = dem.tf.transform((x0 + dx).ravel(), (y0 + dy).ravel(), direction="INVERSE")
+    z = dem.sample(np.asarray(lat_s), np.asarray(lon_s))
+    A = np.c_[dx.ravel(), dy.ravel(), np.ones(dx.size)]
+    (a, b, _), *_ = np.linalg.lstsq(A, z, rcond=None)
+    return float(np.degrees(np.arctan(np.hypot(a, b))))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dem", required=True)
@@ -94,8 +108,10 @@ def main():
     res = {}
     for s in sites:
         h0, hz = horizon_for(dem, s["lat"], s["lon"], args.max_km, args.obs_height)
-        res[s["id"]] = {"elev_m": round(h0, 1), "horizon": [round(float(v), 3) for v in hz]}
-        print(f"  {s['name']:<22} h={h0:8.0f} m  horizonte min/med/max = "
+        sl = slope_deg(dem, s["lat"], s["lon"])
+        res[s["id"]] = {"elev_m": round(h0, 1), "slope_deg": round(sl, 1),
+                        "horizon": [round(float(v), 3) for v in hz]}
+        print(f"  {s['name']:<22} h={h0:8.0f} m  pendiente {sl:4.1f}°  horizonte min/med/max = "
               f"{hz.min():.2f} / {np.median(hz):.2f} / {hz.max():.2f} deg")
     (OUT / "horizons.json").write_text(json.dumps(res), encoding="utf-8")
     print("-> horizons.json")

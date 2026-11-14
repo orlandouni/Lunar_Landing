@@ -1,0 +1,9 @@
+{
+ "size": 1024,
+ "extentM": 608000.0,
+ "radiusM": 1737400.0,
+ "minM": -7238.65283203125,
+ "maxM": 7007.19091796875,
+ "projection": "south polar stereographic, x = rho*sin(lon), y = rho*cos(lon), rho = 2R*tan(c/2); row 0 = +y",
+ "source": "LOLA LDEM_80S_80MPP_ADJ (NASA GSFC PGDA), block-averaged"
+}
