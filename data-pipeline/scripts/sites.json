@@ -1,0 +1,14 @@
+{
+  "_nota": "Puntos representativos APROXIMADOS. NASA publica las 9 regiones candidatas Artemis solo como zonas en un mapa (NASA, 28-oct-2024; LPSC 2026 NTRS 20250011660), sin coordenadas de centro. Cada punto se derivó de la feature IAU más cercana (USGS Gazetteer of Planetary Nomenclature). Refinar en LROC QuickMap si hay tiempo. lon = grados Este (-180..180).",
+  "sites": [
+    {"id": "peak-near-cabeus-b", "name": "Peak near Cabeus B", "lat": -84.10, "lon": -55.00, "basis": "PENDIENTE: estimado cerca del cráter Cabeus B; verificar en QuickMap"},
+    {"id": "haworth", "name": "Haworth", "lat": -86.90, "lon": -4.00, "basis": "centro del cráter Haworth (Wikipedia 86.9S 4.0W)"},
+    {"id": "malapert-massif", "name": "Malapert Massif", "lat": -85.99, "lon": 2.93, "basis": "cima del macizo Malapert (al sur del cráter Malapert, Gazetteer 3603: -84.90, 12.90)"},
+    {"id": "mons-mouton-plateau", "name": "Mons Mouton Plateau", "lat": -85.40, "lon": 31.50, "basis": "meseta en la cima de Mons Mouton (estimado)"},
+    {"id": "mons-mouton", "name": "Mons Mouton", "lat": -84.60, "lon": 31.00, "basis": "Gazetteer 16070: -84.60, 31.00"},
+    {"id": "nobile-rim-1", "name": "Nobile Rim 1", "lat": -86.45, "lon": 53.27, "basis": "PENDIENTE: estimado mal ubicado; en Moon Trek queda junto a Leibnitz Beta Plateau. Cráter Nobile, Gazetteer 4321: -85.28, 53.27"},
+    {"id": "nobile-rim-2", "name": "Nobile Rim 2", "lat": -85.00, "lon": 68.00, "basis": "borde este del cráter Nobile (estimado)"},
+    {"id": "de-gerlache-rim-2", "name": "de Gerlache Rim 2", "lat": -88.20, "lon": -66.00, "basis": "borde del cráter de Gerlache, Gazetteer 1439: -88.50, -87.10, D=32 km (estimado)"},
+    {"id": "slater-plain", "name": "Slater Plain", "lat": -88.08, "lon": 111.29, "basis": "cráter Slater (Wikipedia 88.08S 111.29E)"}
+  ]
+}
