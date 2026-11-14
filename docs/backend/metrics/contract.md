@@ -1,6 +1,7 @@
 # Contrato de datos: métricas y frontend
 
-Estado: borrador v0.1 para coordinar el desarrollo de la persona 3.
+Estado: borrador v0.2 para coordinar series, métricas y frontend.
+Responsables: Marco (persona 1, catálogo y terreno), Bryan (persona 2, series temporales) y Angel (persona 3, métricas e integración).
 Los formatos de archivos descritos existen; las reglas objetivo de duración y validación todavía requieren implementación. Las propuestas señaladas deben confirmarse con sus consumidores antes de cambiar comportamiento.
 
 ## Flujo y propiedad
@@ -18,6 +19,8 @@ Persona 2: series horarias ──────┘                     │
 
 La persona 3 no recalcula coordenadas ni efemérides. Frontend lee archivos estáticos; no hay endpoints HTTP de backend ni base de datos en este contrato. El directorio de documentación es `docs/backend/metrics/`; nunca se copia con los datos públicos.
 
+Bryan entrega series y evidencia de procedencia en una carpeta o rama separada; no actualiza el paquete compartido. Angel valida la unión y es el único que integra `data-pipeline/public/` y su copia a frontend. Cada bloque prueba sus propias reglas; la validación de integración no sustituye las pruebas del productor.
+
 ## Entradas
 
 | Archivo | Estructura | Validación |
@@ -31,6 +34,28 @@ La persona 3 no recalcula coordenadas ni efemérides. Frontend lee archivos est�
 Todos los números deben ser finitos: no se aceptan NaN, Infinity, cadenas numéricas ni booleanos como números. Para el lote completo se esperan los nueve IDs del catálogo, sin combinar versiones distintas de coordenadas, horizontes y efemérides.
 
 Las series de `public/samples/` son resultados distribuidos, no una segunda fuente automática. Si se usan para recuperar entradas ausentes, debe hacerse explícitamente sobre una copia, con procedencia revisada por persona 2. No introducir un fallback silencioso.
+
+## Procedencia y reproducibilidad de las series
+
+Requisito objetivo: la entrega de Bryan debe permitir identificar el periodo solicitado y reproducir la consulta. La cantidad de filas o las fechas extremas, por sí solas, no definen el periodo: la última fila puede ser un inicio de intervalo o el cierre opcional.
+
+Propuesta de manifiesto separado de los arreglos `Sample`, pendiente de acordar ubicación y esquema con Angel. No es un archivo existente ni un campo nuevo obligatorio del frontend. Debe registrar como mínimo:
+
+- `start`, `end` en UTC y paso temporal; indicar si se conserva el cierre.
+- IDs, versión o hash del catálogo y coordenadas efectivamente enviadas, incluida su precisión; altura del observador, unidades y referencia utilizada.
+- URL del servicio y todos los parámetros efectivos de Horizons: cuerpos, centro observador, sistema de coordenadas, configuración angular y escala temporal verificada en la respuesta. No basta con añadir `Z` a una fecha sin comprobar su escala.
+- Fecha de descarga de cada respuesta, versión o commit del generador y hashes SHA-256 de respuestas originales y series entregadas.
+- Procedencia de entradas recuperadas desde `public/samples/`, si corresponde, y limitaciones conocidas. No atribuirles parámetros o fechas de descarga que no puedan demostrarse.
+
+Angel contrasta esta evidencia con el catálogo y la entrega de terreno de Marco antes de integrar. El manifiesto técnico acompaña la entrega entre bloques; su inclusión en el paquete público requiere un acuerdo separado. Hasta definirlo, registrar esta evidencia en el informe de entrega; la procedencia no demostrada debe quedar explícita como limitación provisional.
+
+La altura usada en la consulta de efemérides y `elevM` del DEM no se consideran intercambiables automáticamente: Marco y Bryan deben documentar sus referencias y acordar cualquier cambio.
+
+### Identificación y validez de caché (Bryan)
+
+La clave debe derivarse de una serialización estable de todos los parámetros efectivos enviados, incluidos coordenadas y altura, cuerpo, centro, inicio y fin completos, paso y opciones de salida. Un hash de esa representación permite distinguir consultas; el ID del sitio y las fechas recortadas al día no bastan.
+
+La misma consulta debe reutilizar la misma clave; cambiar cualquier parámetro efectivo debe invalidarla. Conservar los parámetros junto a la respuesta y validar esta antes de aceptarla. Una respuesta parcial, inválida o de error no constituye una entrada válida de caché. La caché antigua sin configuración demostrable no se reutiliza automáticamente; su migración debe ser explícita y verificable.
 
 ## Salidas existentes que se conservan
 
@@ -69,6 +94,8 @@ Ejemplo sintético de una fila, no una serie válida para todo el periodo.
 | `sunAz`, `earthAz` | Grados en [0,360), desde el norte lunar hacia el este. |
 | `sunEl`, `earthEl` | Grados en [-90,90], respecto al horizonte matemático local. |
 
+El productor valida números y rangos antes de redondear. Si se mantiene la precisión actual de tres decimales, el azimut exportado se calcula como `round(az, 3) % 360`: un azimut válido de `359.9996` se exporta como `0.0`, no como `360.0`. Esto no autoriza convertir valores originales inválidos en válidos mediante módulo. Las elevaciones no se normalizan mediante módulo. La respuesta original se conserva sin alterar; la selección del índice del horizonte pertenece al cálculo de visibilidad.
+
 ### `summary.json`: objeto de métricas
 
 ```text
@@ -95,23 +122,47 @@ El bloque anterior es notación de esquema, no JSON ejecutable. `rule` describe 
 
 Duraciones en horas, porcentajes en [0,100]. `bothHours` no supera `sunHours` ni `earthHours`; ninguna duración supera `hours`. Los periodos vacíos son inválidos, no porcentajes cero. Para mostrar resúmenes precomputados, frontend utiliza sus valores sin recalcularlos con reglas distintas.
 
-## Tiempo: propuesta de acuerdo con persona 2 y frontend
+## Tiempo: contrato propuesto entre Bryan, Angel y frontend
 
 1. Los periodos son semiabiertos: `[start, end)`. El inicio cuenta; el fin no.
 2. Cada muestra en `t` representa el estado del intervalo `[t, t + 1 hora)` dentro del periodo solicitado. Es una aproximación horaria, no una hora exacta de salida/puesta del astro.
-3. Se exige una muestra para cada inicio de hora incluido en el periodo. Se puede conservar una muestra adicional exactamente en `end`, pero no aporta duración.
+3. Se exige una muestra para cada inicio de hora incluido en el periodo. Se acepta la serie con o sin una única muestra adicional exactamente en `end`; esa muestra también debe ser válida, pero no aporta duración ni crea un intervalo. No exigir el cierre para inferir la última hora cubierta.
 4. No rellenar huecos, interpolar ni extrapolar silenciosamente.
 5. El año objetivo va de `2028-01-01T00:00:00Z` a `2029-01-01T00:00:00Z`: 8.784 intervalos. La serie actual contiene 8.785 muestras por incluir el cierre.
 6. El resumen solo incluye meses con duración dentro del periodo: doce claves de 2028, ninguna `2029-01`.
 7. Propuesta para selecciones de usuario: horas UTC alineadas, `start < end`, dentro de la cobertura. Fechas arbitrarias/subhorarias requieren otro acuerdo antes de implementarse.
 
+El periodo base y el paso se proporcionan explícitamente al validador y al cálculo de métricas mediante la configuración acordada; no se infiere `end` de la última fila. Esto es un requisito de implementación, no una opción de CLI ya disponible. Los timestamps de la malla deben tener minutos y segundos cero; otros pasos admitidos por Horizons quedan fuera de la entrega horaria de este MVP.
+
+| Periodo declarado | Filas aceptadas | Duración |
+|---|---|---|
+| Año 2028, sin cierre | 8.784; última `2028-12-31T23:00:00Z` | 8.784 h |
+| Año 2028, con cierre | 8.785; última `2029-01-01T00:00:00Z` | 8.784 h |
+| `[2028-01-01T00:00:00Z, 2028-01-02T00:00:00Z)` | 24, o 25 con cierre | 24 h |
+
+Para validar una entrega base, rechazar filas anteriores a `start` o posteriores a `end`; la única fila opcional fuera del intervalo semiabierto es la situada exactamente en `end`. Para calcular una subventana sobre una entrega base ya validada, seleccionar los inicios de intervalo dentro de la subventana: las demás filas de la entrega base no son errores ni aportan duración a esa selección. Todos los sitios comparados deben cubrir exactamente la misma malla requerida; la presencia del cierre opcional no cambia esa cobertura.
+
+Propuesta de transición: conservar el cierre en las series actuales para evitar reescrituras innecesarias; los validadores y consumidores deben admitir ambas variantes y producir las mismas métricas. Bryan confirma esta convención con Angel; frontend debe aplicarla también a estados, fechas navegables y agrupaciones diarias para no crear un día adicional de 2029.
+
 Los máximos mensuales se recortan a cada mes. El máximo anual se calcula sobre la serie completa; no es necesariamente el mayor máximo mensual.
+
+## Validación de series y responsabilidades
+
+Bryan valida tanto la respuesta original como el JSON exportado; Angel vuelve a comprobar el contrato de entrada antes de integrar.
+
+- En el parser, detectar timestamps inválidos, duplicados y desorden antes de almacenarlos en un diccionario o de ordenar filas. No sobrescribir duplicados silenciosamente.
+- Exigir la malla completa para Sol y Tierra por separado. Comprobar que sus fechas coinciden, incluido el cierre si está presente, antes de unirlos. No usar la intersección como sustituto de validación ni perder filas silenciosamente.
+- En el JSON exportado, validar campos requeridos, tipos numéricos estrictos, finitud, rangos y UTC; no aceptar cadenas numéricas ni booleanos como números. El parser sí convierte las columnas textuales de Horizons a números, comprobando su validez. No rellenar ni interpolar valores ausentes o inválidos.
+- El validador propio de Bryan debe poder revisar series existentes sin red ni modificaciones y recibir explícitamente periodo y paso. Un error debe identificar archivo o sitio y, cuando corresponda, fila, fecha o campo; terminar con código distinto de cero.
+- Una respuesta rechazada no debe sobrescribir una serie previamente válida. Preparar y validar la serie antes de sustituir su archivo; no anunciar éxito de una entrega completa si faltan sitios.
+
+Pruebas mínimas del bloque de series: año con y sin cierre; ventana de 24 horas con y sin cierre; hora ausente; duplicado y desorden en respuesta original; fechas distintas entre Sol y Tierra; fecha sin UTC o fuera del periodo; paso no horario; campo ausente, booleano o número no finito; ángulo inválido y redondeo cerca de 360; respuesta truncada; cambio de coordenadas, paso u horas de consulta que cambie la clave de caché. Usar fixtures pequeños sin red; una consulta real de contraste es una comprobación adicional.
 
 ## Visibilidad y compatibilidad de redondeo
 
 Regla existente: el centro del astro es visible solo si `el > horizon[index]`. Igualdad significa no visible; `both = sunVisible AND earthVisible`.
 
-**Discrepancia actual:** `build.py` usa `round()` de Python, mientras el README muestra `Math.round()` de JavaScript. En valores terminados en `.5` pueden elegir índices diferentes.
+**Discrepancia actual:** `build.py` usa `round()` de Python y `web/src/lib/visibility.ts` usa `Math.round()` de JavaScript. En valores terminados en `.5` pueden elegir índices diferentes.
 
 Propuesta compatible con los resultados actuales: conservar redondeo al entero más cercano con empates al par, y después aplicar módulo 360. Confirmarlo con frontend; no sustituir automáticamente por `Math.round()`.
 
@@ -123,6 +174,8 @@ Propuesta compatible con los resultados actuales: conservar redondeo al entero m
 | 359.5 | 0 |
 
 No incluir fracciones de disco solar/terrestre en este MVP. Si frontend calcula estados para una ventana, debe usar la misma regla; si solo dibuja resultados, no necesita duplicar el cálculo.
+
+El frontend actual también calcula duraciones con `samples.length` y agrupa días por bloques de 24 filas. Corregir solo `summary.json` no corrige esas vistas si siguen recalculando. Angel y frontend deben acordar qué vistas consumen resúmenes y cuáles calculan desde muestras, aplicando en todas el periodo semiabierto y el mismo redondeo. Bryan entrega ángulos; no los adapta al índice del horizonte para compensar diferencias entre consumidores.
 
 ## Intervalos, comparación y ranking
 
@@ -154,7 +207,10 @@ Cambiar coordenadas obliga a regenerar horizonte y efemérides del sitio; conser
 
 ## Lista de entrega
 
-- [ ] Catálogo, horizontes y series corresponden a la misma versión de sitios.
+- [ ] Catálogo, horizontes y series corresponden a la misma versión de sitios, con evidencia de procedencia y parámetros efectivos.
+- [ ] Bryan entrega validador y pruebas de parser, cobertura y caché; no se ocultan duplicados ni diferencias entre Sol y Tierra.
+- [ ] Periodo explícito y variantes con/sin cierre comprobadas: mismas métricas, sin día adicional en frontend.
+- [ ] Convenciones temporal y de redondeo confirmadas con Angel y frontend; ubicación y esquema del manifiesto acordados antes de exigirlo como archivo.
 - [ ] Nueve sitios completos y métricas anuales de 8.784 horas.
 - [ ] Resúmenes con doce meses de 2028 y sin horas del cierre de 2029.
 - [ ] Pruebas de límites temporales y redondeo compartidas con frontend.
