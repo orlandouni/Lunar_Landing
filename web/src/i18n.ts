@@ -1,6 +1,12 @@
 import type { Lang } from './types'
 
 const dict = {
+  tripHeading: { es: 'Planifica tu viaje', en: 'Plan your trip' },
+  tripArrival: { es: 'Alunizaje', en: 'Lunar arrival' },
+  tripDeparture: { es: 'Despegue lunar', en: 'Lunar departure' },
+  tripSearch: { es: 'Encontrar el mejor sitio', en: 'Find the best site' },
+  tripOptions: { es: 'Opciones de búsqueda', en: 'Search options' },
+  tripConditions: { es: 'Ver condiciones del viaje', en: 'View trip conditions' },
   appTitle: { es: 'Kairos', en: 'Kairos' },
   appSubtitle: { es: 'Navegador de sitios de alunizaje · Polo sur lunar 2028', en: 'Lunar landing site navigator · Lunar south pole 2028' },
   loading: { es: 'Cargando efemérides…', en: 'Loading ephemerides…' },

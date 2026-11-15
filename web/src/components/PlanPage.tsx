@@ -1,6 +1,6 @@
 // "Plan trip" tab: arrival and departure on the Moon → where to land and the best time to lift off.
 // Every site is scored on the whole stay: Sun + Earth at landing, during the stay and at liftoff.
-import { useMemo } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { bestLaunches, planStay, type PlanRow } from '../lib/plan'
 import { fmtHours } from '../lib/visibility'
 import { useApp } from '../store'
@@ -43,6 +43,10 @@ export function PlanPage() {
   const times = data.times
   const n = times.length
   const t0 = Date.parse(times[0])
+  const [draft, setDraft] = useState({ arrive: plan.arrive.slice(0, 16), leave: plan.leave.slice(0, 16), scope: plan.scope })
+  const [searched, setSearched] = useState(false)
+  const [error, setError] = useState('')
+  const result = useRef<HTMLElement>(null)
   const idxOf = (iso: string) => Math.min(n - 1, Math.max(0, Math.round((Date.parse(iso) - t0) / H)))
   const land = idxOf(plan.arrive)
   const leave = idxOf(plan.leave)
@@ -56,9 +60,9 @@ export function PlanPage() {
 
   const ids = useMemo(() => data.sites.filter((s) => plan.scope === 'all' || isCandidate(s.id)).map((s) => s.id), [data.sites, plan.scope, isCandidate])
   const byId = Object.fromEntries(data.sites.map((s) => [s.id, s]))
-  const rows = useMemo(() => (fits ? planStay(flags, prefix, ids, land, leave) : []), [fits, flags, prefix, ids, land, leave])
+  const rows = useMemo(() => (searched && fits ? planStay(flags, prefix, ids, land, leave) : []), [searched, fits, flags, prefix, ids, land, leave])
   // Same stay shifted up to ±15 days (arrival and departure move together)
-  const options = useMemo(() => (fits ? bestLaunches(flags, prefix, ids, land, 0, stayH, RANGE_D * 24, n) : []), [fits, flags, prefix, ids, land, stayH, n])
+  const options = useMemo(() => (searched && fits ? bestLaunches(flags, prefix, ids, land, 0, stayH, RANGE_D * 24, n) : []), [searched, fits, flags, prefix, ids, land, stayH, n])
   const best = rows[0]
 
   const show = (id: string, k: number) => {
@@ -70,59 +74,72 @@ export function PlanPage() {
   const leaveText = (r: PlanRow) =>
     r.bestLeave < 0 ? t('noLiftoffWindow') : r.bestLeave === leave ? t('leaveAsPlanned') : `${at(r.bestLeave)} · ${fmtHours(leave - r.bestLeave)} ${t('early')}`
 
-  const dateInput = (label: string, k: number, onPick: (v: string) => void) => (
-    <label className="flex flex-col gap-1 text-[11px] text-slate-500">
+  const editDates = (patch: Partial<typeof draft>) => { setDraft(d => ({ ...d, ...patch })); setSearched(false); setError('') }
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (Date.parse(draft.leave + 'Z') <= Date.parse(draft.arrive + 'Z')) { setError(t('leaveBeforeArrive')); return }
+    setPlan({ arrive: draft.arrive + ':00Z', leave: draft.leave + ':00Z', scope: draft.scope })
+    setError(''); setSearched(true)
+    requestAnimationFrame(() => {
+      result.current?.focus({ preventScroll: true })
+      result.current?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' })
+    })
+  }
+  const dateInput = (label: string, key: 'arrive' | 'leave') => (
+    <label className="trip-date">
       {label}
       <input
         type="datetime-local"
+        required
         step={3600}
         min={times[0].slice(0, 16)}
         max={times[n - 1].slice(0, 16)}
-        value={iso(k).slice(0, 16)}
-        onChange={(e) => e.target.value && onPick(`${e.target.value.slice(0, 13)}:00:00Z`)}
-        className="rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 font-mono text-sm text-slate-100 outline-none [color-scheme:dark] focus:border-white/25"
+        value={draft[key]}
+        onChange={(e) => editDates({ [key]: e.target.value })}
+        aria-describedby={error ? 'trip-error' : undefined}
+        aria-invalid={error ? true : undefined}
       />
     </label>
   )
 
   return (
-    <Sheet>
-      {/* Inputs: arrival and departure only */}
-      <section className="panel">
-        <h2 className="panel-title">{t('planTitle')}</h2>
-        <p className="mb-4 max-w-3xl text-sm text-slate-400">{t('planIntro')}</p>
-        <div className="flex flex-wrap items-end gap-4">
-          {dateInput(t('arriveLabel'), land, (v) => setPlan({ arrive: v }))}
-          {dateInput(t('leaveLabel'), leave, (v) => setPlan({ leave: v }))}
-          {fits && (
-            <div className="pb-2 font-mono text-sm text-slate-400">
-              {t('stayLength')}: <span className="text-slate-100">{fmtHours(stayH)}</span>
-            </div>
-          )}
-          <div className="ml-auto flex rounded-full bg-white/5 p-0.5 text-xs">
+    <Sheet wide>
+      <div className="trip-planner">
+      <form className="trip-form" onSubmit={submit}>
+        <h1>{t('tripHeading')}</h1>
+        <div className="trip-dates">
+          {dateInput(t('tripArrival'), 'arrive')}
+          {dateInput(t('tripDeparture'), 'leave')}
+        </div>
+        <p className="trip-timezone">UTC · {times[0].slice(0, 10)} — {times[n - 1].slice(0, 10)}</p>
+        {error && <p id="trip-error" className="trip-error" role="alert">{error}</p>}
+        <button type="submit" className="trip-submit">{t('tripSearch')}<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" strokeWidth="1.5" /></svg></button>
+        <details className="trip-options"><summary>{t('tripOptions')}</summary>
+          <div className="mt-4 flex flex-wrap gap-2">
             {(['artemis', 'all'] as const).map((s) => (
               <button
                 key={s}
-                onClick={() => setPlan({ scope: s })}
-                className={`rounded-full px-3 py-1 transition ${plan.scope === s ? 'bg-white/10 text-slate-100' : 'text-slate-500 hover:text-slate-300'}`}
+                type="button"
+                aria-pressed={draft.scope === s}
+                onClick={() => editDates({ scope: s })}
+                className={`rounded-full px-4 py-3 text-sm transition ${draft.scope === s ? 'bg-white/10 text-slate-100' : 'text-slate-400 hover:text-slate-300'}`}
               >
                 {s === 'artemis' ? t('scopeArtemis') : t('scopeAll')}
               </button>
             ))}
           </div>
-        </div>
-        {!fits && <p className="mt-3 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-200">{t('leaveBeforeArrive')}</p>}
-        <Explain k="explainPlan" />
-      </section>
+          <Explain k="explainPlan" />
+        </details>
+      </form>
 
       {fits && best && (
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="trip-results">
           {/* Recommendation */}
-          <section className="panel">
+          <section className="trip-recommendation" ref={result} tabIndex={-1} aria-label={t('planBest')}>
             <h2 className="panel-title">{t('planBest')}</h2>
             <div className="flex items-baseline justify-between gap-3">
               <div className="text-2xl font-light text-slate-100">
-                <span className="text-both">★</span> {byId[best.id].name}
+                {byId[best.id].name}
               </div>
               <div className="font-mono text-3xl font-light text-both">
                 {best.stayPct}
@@ -130,6 +147,10 @@ export function PlanPage() {
               </div>
             </div>
             <div className="mb-3 text-right text-[11px] text-slate-500">{t('stayCoverage')}</div>
+            <p className="trip-period">{at(land)} — {at(leave)} · {fmtHours(stayH)}</p>
+            <button className="trip-view" onClick={() => show(best.id, land)}>{t('showLanding')}</button>
+            <details className="trip-disclosure"><summary>{t('tripConditions')}</summary>
+            <div className="trip-disclosure-body">
             <StayStrip f={flags[best.id]} land={land} leave={leave} mark={best.bestLeave} />
             <div className="mt-1 flex justify-between font-mono text-[10px] text-slate-500">
               <span>{at(land)}</span>
@@ -162,20 +183,20 @@ export function PlanPage() {
               </div>
             </dl>
             <div className="mt-4 flex flex-wrap gap-2">
-              <button className="rounded-xl bg-white/10 px-3 py-2 text-sm text-slate-100 hover:bg-white/20" onClick={() => show(best.id, land)}>
-                {t('showLanding')} →
-              </button>
               {best.bestLeave >= 0 && (
                 <button className="rounded-xl bg-white/5 px-3 py-2 text-sm text-slate-300 hover:bg-white/10" onClick={() => show(best.id, best.bestLeave)}>
                   {t('showLiftoff')} →
                 </button>
               )}
             </div>
+            <p className="mt-4 text-xs text-slate-400">{t('planLegend')}</p>
+            </div></details>
           </section>
 
           {/* Better departure dates */}
-          <section className="panel">
-            <h2 className="panel-title">{t('betterDates')}</h2>
+          <details className="trip-disclosure trip-secondary">
+            <summary>{t('betterDates')}</summary>
+            <div className="trip-disclosure-body">
             <p className="mb-3 text-xs text-slate-500">{t('betterDatesHint')}</p>
             <ul className="space-y-1.5">
               {options.map((o) => {
@@ -183,7 +204,7 @@ export function PlanPage() {
                 const same = d === 0
                 const pct = Math.round((1000 * (prefix[o.id][o.launch + stayH + 1] - prefix[o.id][o.launch])) / (stayH + 1)) / 10
                 return (
-                  <li key={o.id} className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-2 text-sm">
+                  <li key={o.id} className="trip-alternative">
                     <span className="min-w-0 flex-1 truncate text-slate-100">{byId[o.id].name}</span>
                     <span className="font-mono text-xs text-slate-400">
                       {at(o.launch)} → {at(o.launch + stayH)}
@@ -193,7 +214,11 @@ export function PlanPage() {
                     <button
                       className="rounded-full bg-white/10 px-3 py-0.5 text-xs text-slate-100 hover:bg-white/20 disabled:opacity-30"
                       disabled={same}
-                      onClick={() => setPlan({ arrive: iso(o.launch), leave: iso(o.launch + stayH) })}
+                      onClick={() => {
+                        setPlan({ arrive: iso(o.launch), leave: iso(o.launch + stayH) })
+                        setDraft(d => ({ ...d, arrive: iso(o.launch).slice(0, 16), leave: iso(o.launch + stayH).slice(0, 16) }))
+                        result.current?.scrollIntoView({ block: 'nearest', behavior: 'auto' })
+                      }}
                     >
                       {t('useDate')}
                     </button>
@@ -201,21 +226,23 @@ export function PlanPage() {
                 )
               })}
             </ul>
-          </section>
+            </div>
+          </details>
         </div>
       )}
 
       {fits && rows.length > 0 && (
-        <section className="panel">
-          <h2 className="panel-title">{t('planRanking')}</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[920px] whitespace-nowrap text-left text-sm">
+        <details className="trip-disclosure trip-secondary">
+          <summary>{t('planRanking')} <span className="text-slate-500">({rows.length})</span></summary>
+          <div className="trip-disclosure-body">
+          <div className="trip-ranking-wrap">
+            <table className="trip-ranking text-left text-sm" role="table">
               <thead className="text-[11px] uppercase tracking-wider text-slate-500">
                 <tr>
                   <th className="py-1">#</th>
                   <th>{t('site')}</th>
                   <th>{t('colLanding')}</th>
-                  <th className="w-[34%]">{t('colStay')}</th>
+                  <th>{t('colStay')}</th>
                   <th>{t('colLiftoff')}</th>
                   <th>{t('colBestLiftoff')}</th>
                   <th>{t('longestDarkStay')}</th>
@@ -223,36 +250,38 @@ export function PlanPage() {
               </thead>
               <tbody>
                 {rows.map((r, i) => (
-                  <tr key={r.id} className="cursor-pointer border-t border-white/5 hover:bg-white/[0.04]" onClick={() => show(r.id, land)} title={t('showLanding')}>
-                    <td className="py-2 font-mono text-slate-500">{i + 1}</td>
-                    <td className="pr-4 text-slate-100">
-                      {byId[r.id].name}
+                  <tr key={r.id} role="row" className="cursor-pointer border-t border-white/5 hover:bg-white/[0.04]" onClick={() => show(r.id, land)} title={t('showLanding')}>
+                    <td role="cell" className="trip-rank-number font-mono text-slate-400">{i + 1}</td>
+                    <td role="cell" className="trip-rank-site text-slate-100">
+                      <button className="py-2 text-left underline decoration-white/20 underline-offset-4" onClick={e => { e.stopPropagation(); show(r.id, land) }}>{byId[r.id].name}</button>
                       {i === 0 && <span className="ml-1.5 text-both">★</span>}
                     </td>
-                    <td>
+                    <td role="cell" data-label={t('colLanding')}>
                       <Dots sun={r.landSun} earth={r.landEarth} />
                     </td>
-                    <td className="pr-4">
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1">
+                    <td role="cell" data-label={t('colStay')} className="trip-rank-stay">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <div className="min-w-0 flex-1">
                           <StayStrip f={flags[r.id]} land={land} leave={leave} />
                         </div>
-                        <span className="w-12 text-right font-mono text-xs text-slate-300">{r.stayPct}%</span>
+                        <span className="shrink-0 text-right font-mono text-xs text-slate-300">{r.stayPct}%</span>
                       </div>
                     </td>
-                    <td>
+                    <td role="cell" data-label={t('colLiftoff')}>
                       <Dots sun={!!flags[r.id].sun[leave]} earth={!!flags[r.id].earth[leave]} />
                     </td>
-                    <td className="pr-4 font-mono text-xs text-slate-300">{leaveText(r)}</td>
-                    <td className="font-mono text-xs text-slate-300">{r.darkH ? fmtHours(r.darkH) : '—'}</td>
+                    <td role="cell" data-label={t('colBestLiftoff')} className="font-mono text-xs text-slate-300">{leaveText(r)}</td>
+                    <td role="cell" data-label={t('longestDarkStay')} className="font-mono text-xs text-slate-300">{r.darkH ? fmtHours(r.darkH) : '—'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <p className="mt-2 text-[11px] text-slate-500">{t('planLegend')}</p>
-        </section>
+          </div>
+        </details>
       )}
+      </div>
     </Sheet>
   )
 }
