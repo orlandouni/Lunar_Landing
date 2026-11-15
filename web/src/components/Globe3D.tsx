@@ -283,6 +283,9 @@ function CameraRig({ view, target, earthDir, sunDir, nonce }: { view: View; targ
   const goal = useRef<{ pos: THREE.Vector3; tgt: THREE.Vector3 } | null>(null)
 
   useEffect(() => {
+    // El norte lunar es -Y en este marco. En la vista global debe quedar
+    // arriba en pantalla; las vistas de terreno conservan su vertical local.
+    camera.up.set(0, view === 'moon' ? -1 : 1, 0)
     const up = target.clone().normalize()
     if (view === 'site') {
       // vista oblicua desde atrás del sitio, mirando hacia la Tierra
@@ -349,7 +352,7 @@ export function MoonCanvas({ view, nonce, hover, setHover }: { view: View; nonce
     <Canvas
       shadows
       dpr={[1, 2]}
-      camera={{ fov: 45, near: 0.5, far: 400000, position: [0, R_KM * 3.3, R_KM] }}
+      camera={{ fov: 45, near: 0.5, far: 400000, position: [0, R_KM * 3.3, R_KM], up: [0, -1, 0] }}
       gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
     >
       <Scene view={view} nonce={nonce} hover={hover} setHover={setHover} />

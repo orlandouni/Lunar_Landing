@@ -1,6 +1,6 @@
 // Geometría lunar para la escena 3D. Unidades: kilómetros.
 // Marco fijo a la Luna (ME): X = lat 0/lon 0 (mira a la Tierra), Y = lon 90°E, Z = polo norte.
-// En three.js el polo SUR queda hacia +Y (arriba en pantalla): three = (X, -Z, Y). Es una rotación propia.
+// En three.js el polo SUR queda hacia +Y: three = (X, -Z, Y). La cámara global usa -Y como arriba para mostrar el norte arriba.
 import * as THREE from 'three'
 import type { Terrain } from '../types'
 
