@@ -1,5 +1,5 @@
 // Línea de tiempo única: mueve los tres paneles a la vez.
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { MONTHS } from '../i18n'
 import { dailyBoth, nextChange, scoreColor } from '../lib/visibility'
 import { useApp } from '../store'
@@ -8,8 +8,16 @@ const SPEEDS = [1, 4, 12, 24]
 const W = 1000
 
 export function Timeline() {
-  const { data, site, flags, timeIndex, setTimeIndex, playing, setPlaying, speed, setSpeed, t, lang } = useApp()
+  const { data, site, flags, timeIndex, setTimeIndex, playing, setPlaying, speed, setSpeed, t, lang, tab } = useApp()
   const n = data.times.length
+  const [collapsed, setCollapsed] = useState(false)
+  const previousTab = useRef(tab)
+  useEffect(() => {
+    if (previousTab.current !== tab) {
+      setCollapsed(true)
+      previousTab.current = tab
+    }
+  }, [tab])
   const daily = useMemo(() => dailyBoth(data.samples[site.id], site.horizon), [data, site])
   const BAR = W / daily.length
   const f = flags[site.id]
@@ -42,7 +50,8 @@ export function Timeline() {
   }
 
   return (
-    <section className="glass pointer-events-auto absolute inset-x-4 bottom-4 z-30 px-4 py-3" title={t('shortcuts')}>
+    <>
+    <section id="explore-timeline" className={`glass pointer-events-auto absolute inset-x-4 bottom-4 z-30 px-4 py-3 transition-[transform,visibility] duration-300 ease-in-out motion-reduce:transition-none ${collapsed ? '-translate-x-[calc(100%+2rem)] invisible' : 'translate-x-0 visible'}`} title={t('shortcuts')}>
       <div className="flex flex-wrap items-center gap-3">
         <button
           className={`flex h-9 w-9 items-center justify-center rounded-full border text-sm ${playing ? 'border-earth bg-earth/20 text-slate-100' : 'border-white/20 hover:border-white/50'}`}
@@ -51,11 +60,12 @@ export function Timeline() {
         >
           {playing ? '❚❚' : '▶'}
         </button>
-        <button className="btn !px-2 !py-1 font-mono text-xs" onClick={() => setSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length])} title={t('speed')}>
+        <button className="btn !px-2 !py-1 text-xs" onClick={() => setSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length])} title={t('speed')}>
           ×{speed}h
         </button>
-        <span className="font-mono text-sm text-slate-100">{dateStr} UTC</span>
+        <span className="font-mono tabular-nums text-sm text-slate-100">{dateStr} UTC</span>
         <span className="flex-1" />
+        <button className="btn !px-2 !py-1 text-xs" onClick={() => setCollapsed(true)} aria-label={t('hideTimeline')} title={t('hideTimeline')} aria-expanded={!collapsed} aria-controls="explore-timeline">←</button>
         <button className="btn !px-2 !py-1 text-xs text-sun disabled:opacity-30" disabled={nextSun < 0} onClick={() => go(nextSun)}>
           ⏭ {f.sun[timeIndex] ? t('nextSunset') : t('nextSunrise')}
         </button>
@@ -91,7 +101,7 @@ export function Timeline() {
           ))}
           <line x1={(timeIndex / n) * W} x2={(timeIndex / n) * W} y1={0} y2={40} stroke="#fff" strokeWidth={2} vectorEffect="non-scaling-stroke" />
         </svg>
-        <div className="relative h-3 font-mono text-[10px] text-slate-500">
+        <div className="relative h-3 text-[10px] text-slate-500">
           {monthTicks.map(({ i, m }) => (
             <span key={i} className="absolute" style={{ left: `${(i / n) * 100}%` }}>
               {MONTHS[lang][m]}
@@ -100,5 +110,13 @@ export function Timeline() {
         </div>
       </div>
     </section>
+    {collapsed && (
+      <div className="glass absolute bottom-4 left-4 z-30 flex max-w-[calc(100vw-2rem)] items-center gap-2 p-2">
+        <button className="btn text-xs" onClick={() => setCollapsed(false)} aria-expanded={!collapsed} aria-controls="explore-timeline">→ {t('showTimeline')}</button>
+        <button className="btn" onClick={() => setPlaying(!playing)} aria-label={playing ? t('pause') : t('play')}>{playing ? 'Ⅱ' : '▶'}</button>
+        <span className="hidden font-mono tabular-nums text-xs text-slate-400 sm:inline">{dateStr} UTC</span>
+      </div>
+    )}
+    </>
   )
 }

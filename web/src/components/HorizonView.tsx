@@ -86,17 +86,9 @@ export function HorizonView({ compact = false }: { compact?: boolean }) {
     <section className={compact ? '' : 'panel'}>
       {!compact && <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="panel-title">
-          {t('horizonTitle')} · <span className="text-slate-100">{site.name}</span>
+          {t('horizonTitle')}
         </h2>
-        <div className="flex items-center gap-1 font-mono text-[11px] text-slate-400">
-          <span className="mr-1">{t('trail')}</span>
-          {TRAILS.map((d) => (
-            <button key={d} className={`btn !px-2 !py-0.5 text-[11px] ${trailDays === d ? 'btn-on' : ''}`} onClick={() => setTrailDays(d)}>
-              ±{d}d
-            </button>
-          ))}
-          <span className="ml-2 text-slate-300">{now.t.replace('T', ' ').replace(':00Z', ' UTC')}</span>
-        </div>
+
       </div>}
       <svg
         viewBox={`0 0 ${W} ${H}`}
@@ -126,7 +118,7 @@ export function HorizonView({ compact = false }: { compact?: boolean }) {
         {grid.map((el) => (
           <g key={el}>
             <line x1={PAD_L} x2={W} y1={y(el)} y2={y(el)} stroke={el === 0 ? '#3a4d72' : '#16213a'} strokeDasharray={el === 0 ? '4 3' : undefined} />
-            <text x={PAD_L - 4} y={y(el) + 3} textAnchor="end" className="fill-slate-500 font-mono text-[9px]">
+            <text x={PAD_L - 4} y={y(el) + 3} textAnchor="end" className="fill-slate-500 font-mono tabular-nums text-[9px]">
               {el}°
             </text>
           </g>
@@ -134,7 +126,7 @@ export function HorizonView({ compact = false }: { compact?: boolean }) {
         {Array.from({ length: 13 }, (_, i) => i * 30).map((az) => (
           <g key={az}>
             <line x1={x(az)} x2={x(az)} y1={PAD_T} y2={H - PAD_B} stroke="#121b2e" />
-            <text x={x(az)} y={H - 8} textAnchor={az === 0 ? 'start' : az === 360 ? 'end' : 'middle'} className="fill-slate-500 font-mono text-[10px]">
+            <text x={x(az)} y={H - 8} textAnchor={az === 0 ? 'start' : az === 360 ? 'end' : 'middle'} className="fill-slate-500 font-mono tabular-nums text-[10px]">
               {az % 90 === 0 ? `${['N', 'E', 'S', 'W', 'N'][az / 90]} ` : ''}
               {az}°
             </text>
@@ -187,16 +179,30 @@ export function HorizonView({ compact = false }: { compact?: boolean }) {
           </g>
         )}
       </svg>
-      {!compact && <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs">
+      {!compact && <details className="mt-3 border-t border-white/[0.06] pt-3">
+        <summary className="cursor-pointer text-xs text-slate-400 hover:text-slate-200">{t('horizonOptions')}</summary>
+        <div className="mt-3 space-y-3">
+        <div className="flex flex-wrap items-center gap-1 text-[11px] text-slate-400">
+          <span className="mr-1">{t('trail')}</span>
+          {TRAILS.map((d) => (
+            <button key={d} className={`btn !px-2 !py-0.5 text-[11px] ${trailDays === d ? 'btn-on' : ''}`} aria-pressed={trailDays === d} onClick={() => setTrailDays(d)}>
+              ±{d}d
+            </button>
+          ))}
+          <span className="ml-2 font-mono tabular-nums text-slate-400">{now.t.replace('T', ' ').replace(':00Z', ' UTC')}</span>
+        </div>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
         <span className={sunVis ? 'text-sun' : 'text-slate-500'}>
           ● {t('sun')}: {sunVis ? t('visible') : t('hidden')}
-          {sunPartial ? ' (½)' : ''} · az {now.sunAz.toFixed(1)}° · el {now.sunEl.toFixed(2)}°
+          {sunPartial ? ' (½)' : ''} · <span className="font-mono tabular-nums">az {now.sunAz.toFixed(1)}° · el {now.sunEl.toFixed(2)}°</span>
         </span>
         <span className={earthVis ? 'text-earth' : 'text-slate-500'}>
-          ● {t('earth')}: {earthVis ? t('visible') : t('hidden')} · az {now.earthAz.toFixed(1)}° · el {now.earthEl.toFixed(2)}°
+          ● {t('earth')}: {earthVis ? t('visible') : t('hidden')} · <span className="font-mono tabular-nums">az {now.earthAz.toFixed(1)}° · el {now.earthEl.toFixed(2)}°</span>
         </span>
         <span className="text-slate-500">▲ {t('terrain')}: {site.horizonSource ?? '—'}</span>
-      </div>}
+        </div>
+        </div>
+      </details>}
       <Explain k="explainHorizon" />
     </section>
   )

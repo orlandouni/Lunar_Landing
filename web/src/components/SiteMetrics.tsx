@@ -6,6 +6,7 @@ import { CloseX } from './CloseX'
 import { useApp } from '../store'
 import { Explain } from './Explain'
 import { SkyNow } from './SkyNow'
+import { visibilityState, VISIBILITY_STATES } from '../lib/visibilityStates'
 
 function Big({ label, value, color }: { label: string; value: number; color: string }) {
   return (
@@ -14,7 +15,7 @@ function Big({ label, value, color }: { label: string; value: number; color: str
         {value}
         <span className="text-lg">%</span>
       </div>
-      <div className="text-[11px] uppercase tracking-wider text-slate-500">{label}</div>
+      <div className="text-xs text-slate-400">{label}</div>
     </div>
   )
 }
@@ -31,7 +32,7 @@ function bestWindow(sun: Uint8Array, earth: Uint8Array) {
 }
 
 const BC_W = 720
-const BC_ROW = 9
+const BC_HEIGHT = 32
 
 export function SiteMetrics() {
   const { site, data, timeIndex, setTimeIndex, setPlaying, yearMetrics, flags, t, mode, bestSiteId, lang, dismissed, dismiss } = useApp()
@@ -57,11 +58,6 @@ export function SiteMetrics() {
   const fmtDate = (k: number) =>
     new Date(times[k]).toLocaleDateString(lang === 'es' ? 'es-MX' : 'en-US', { timeZone: 'UTC', day: 'numeric', month: 'short' })
 
-  const rows: { key: string; color: string; on: (k: number) => boolean }[] = [
-    { key: 'sun', color: '#d8b36a', on: (k) => !!f.sun[k] },
-    { key: 'earth', color: '#7ea6d8', on: (k) => !!f.earth[k] },
-    { key: 'both', color: '#86c29c', on: (k) => !!(f.sun[k] && f.earth[k]) },
-  ]
 
   return (
     <section className="panel">
@@ -70,7 +66,7 @@ export function SiteMetrics() {
           {t('metricsTitle')} · <span className="text-slate-100">{site.name}</span>
         </h2>
         {mode === 'mission' && site.id === bestSiteId && (
-          <span className="rounded bg-both/15 px-2 py-0.5 font-mono text-[10px] text-both">★ {t('recommended')}</span>
+          <span className="rounded bg-both/15 px-2 py-0.5 text-[10px] text-both">★ {t('recommended')}</span>
         )}
       </div>
 
@@ -85,13 +81,14 @@ export function SiteMetrics() {
         <SkyNow />
       </div>
 
-      <div className="mb-1 text-[11px] text-slate-500">{t('year')}</div>
+      <div className="mb-2 border-t border-white/[0.06] pt-4 text-sm font-medium text-slate-300">{t('annualAvailability')} · {t('year')}</div>
       <div className="mb-3 grid grid-cols-3 gap-2">
         <Big label={t('sun')} value={m.sunPct} color="#d8b36a" />
         <Big label={t('earth')} value={m.earthPct} color="#7ea6d8" />
         <Big label={t('both')} value={m.bothPct} color="#86c29c" />
       </div>
-      <div className="mb-4 flex flex-wrap gap-x-6 gap-y-1 font-mono text-xs text-slate-400">
+      <p className="mb-3 text-[11px] leading-relaxed text-slate-400">{t('annualAvailabilityHint')}</p>
+      <div className="mb-4 flex flex-wrap gap-x-6 gap-y-1 text-xs text-slate-400">
         <span>
           {t('longestDark')}: <span className="text-slate-200">{fmtHours(m.longestDarkHours)}</span>
         </span>
@@ -105,14 +102,9 @@ export function SiteMetrics() {
         <span>
           {t('barcode')} · {MONTHS[lang][+month.slice(5, 7) - 1]} {month.slice(0, 4)}
         </span>
-        <span className="flex gap-2 font-mono text-[10px]">
-          <span className="text-sun">{t('sun')}</span>
-          <span className="text-earth">{t('earth')}</span>
-          <span className="text-both">{t('both')}</span>
-        </span>
       </div>
       <svg
-        viewBox={`0 0 ${BC_W} ${BC_ROW * 3 + 4}`}
+        viewBox={`0 0 ${BC_W} ${BC_HEIGHT}`}
         preserveAspectRatio="none"
         className="h-10 w-full cursor-pointer"
         onClick={(e) => {
@@ -121,24 +113,22 @@ export function SiteMetrics() {
           setTimeIndex(m0 + Math.min(hours - 1, Math.floor(((e.clientX - r.left) / r.width) * hours)))
         }}
       >
-        {rows.map((row, r) => (
-          <g key={row.key}>
-            <rect x={0} y={r * (BC_ROW + 2)} width={BC_W} height={BC_ROW} fill="#0b1220" />
-            {Array.from({ length: hours }, (_, k) =>
-              row.on(m0 + k) ? <rect key={k} x={k * colW} y={r * (BC_ROW + 2)} width={colW + 0.3} height={BC_ROW} fill={row.color} /> : null,
-            )}
-          </g>
-        ))}
-        <rect x={(i - m0) * colW - 1} y={0} width={2} height={BC_ROW * 3 + 4} fill="#fff" />
+        {Array.from({ length: hours }, (_, k) => {
+          const state = VISIBILITY_STATES.find((state) => state.id === visibilityState(f.sun[m0 + k], f.earth[m0 + k]))!
+          return <rect key={k} x={k * colW} y={0} width={colW} height={BC_HEIGHT} fill={state.color}>
+            <title>{times[m0 + k]} · {t(state.label)}</title>
+          </rect>
+        })}
+        <rect x={(i - m0) * colW - 1} y={0} width={2} height={BC_HEIGHT} fill="#fff" />
       </svg>
 
       {/* Buscador de ventana */}
       {win.len > 0 && (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-md border border-both/25 bg-both/5 px-3 py-2">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-3">
           <div>
-            <div className="text-[11px] uppercase tracking-wider text-both/80">{t('bestWindow')}</div>
+            <div className="mb-1 text-xs font-medium text-slate-300">{t('bestWindow')}</div>
             <div className="text-sm text-slate-100">
-              {fmtDate(win.start)} → {fmtDate(win.start + win.len - 1)} <span className="font-mono text-xs text-slate-400">· {fmtHours(win.len)}</span>
+              <span className="font-mono tabular-nums">{fmtDate(win.start)} → {fmtDate(win.start + win.len - 1)}</span> <span className="text-xs text-slate-400">· {fmtHours(win.len)}</span>
             </div>
           </div>
           <button

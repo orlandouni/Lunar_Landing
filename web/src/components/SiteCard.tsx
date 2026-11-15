@@ -16,7 +16,7 @@ export function SiteCard() {
   const rank = nowRanking.indexOf(site.id) + 1
 
   return (
-    <aside className="glass pointer-events-auto absolute right-4 top-20 z-20 max-h-[calc(100vh-15rem)] w-[360px] max-w-[calc(100vw-2rem)] overflow-y-auto p-4">
+    <aside className="min-h-0 overflow-y-auto p-4">
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2 text-lg font-medium text-slate-100">
@@ -92,10 +92,10 @@ export function SiteCard() {
       </div>
       <div className="mt-1 text-center text-[10px] text-slate-100/30">{t('year')}</div>
 
-      <div className="mt-3">
-        <div className="mb-1 text-[11px] uppercase tracking-[0.15em] text-slate-100/40">{t('horizonTitle')}</div>
-        <HorizonView compact />
-      </div>
+      <details className="mt-3 rounded-xl border border-white/5 p-3">
+        <summary className="cursor-pointer text-[11px] uppercase tracking-[0.15em] text-slate-400">{t('horizonTitle')}</summary>
+        <div className="mt-2"><HorizonView compact /></div>
+      </details>
 
       <div className="mt-2 flex justify-between font-mono text-[11px] text-slate-100/50">
         <span>

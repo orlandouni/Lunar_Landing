@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import { MoonCanvas, type View } from './components/Globe3D'
-import { BestNow } from './components/BestNow'
 import { CloseX } from './components/CloseX'
 import { ComparePage, MetricsPage } from './components/Pages'
 import { PlanPage } from './components/PlanPage'
-import { SiteCard } from './components/SiteCard'
 import { SiteList } from './components/SiteList'
 import { Timeline } from './components/Timeline'
 import { TopBar } from './components/TopBar'
@@ -65,9 +63,7 @@ function Shell() {
       <TopBar />
       {tab === 'explore' && (
         <>
-          <BestNow />
           <SiteList hover={hover} setHover={setHover} />
-          <SiteCard />
           <CameraButtons view={view} go={go} />
           {mode === 'class' && !dismissed.has('explainGlobe') && (
             <div className="glass pointer-events-auto absolute bottom-36 left-4 z-20 flex max-w-md items-start gap-2 p-3 text-sm leading-relaxed text-amber-100/90">

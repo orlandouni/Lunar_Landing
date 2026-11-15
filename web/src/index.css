@@ -36,3 +36,45 @@ body {
 input[type='range'] {
   accent-color: #7ea6d8;
 }
+
+/* Metrics fills the available viewport while retaining natural scrolling on short screens. */
+.metrics-grid .panel {
+  min-width: 0;
+  border-radius: 0.75rem;
+  background: #101722;
+  box-shadow: none;
+}
+
+.metrics-sheet .panel-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  color: #c6cedb;
+}
+
+.metrics-grid > .panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metrics-charts > .panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.metrics-charts > .panel > svg {
+  flex: 1;
+  min-height: 10rem;
+}
+
+.fixed:has(#explore-timeline.invisible) > .metrics-sheet {
+  padding-bottom: 5rem;
+}
+
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid #7ea6d8;
+  outline-offset: 3px;
+}

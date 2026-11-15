@@ -21,7 +21,7 @@ export function BestNow() {
   if (dismissed.has('bestNow'))
     return (
       <button
-        className="glass pointer-events-auto absolute left-1/2 top-[72px] z-20 -translate-x-1/2 px-3 py-1 text-xs text-slate-400 hover:text-slate-100"
+        className="w-full px-3 py-1 text-xs text-slate-400 hover:text-slate-100"
         onClick={() => restore('bestNow')}
       >
         <span className="text-both">★</span> {t('bestFor')} …
@@ -29,7 +29,9 @@ export function BestNow() {
     )
 
   return (
-    <div className="glass pointer-events-auto absolute left-1/2 top-[72px] z-20 flex max-w-[min(860px,calc(100vw-2rem))] -translate-x-1/2 flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2">
+    <details className="mb-2 rounded-xl bg-white/[0.03] px-3 py-2">
+      <summary className="cursor-pointer text-xs text-slate-400">{t('recommendations')} <span className="text-both">· {withBoth.length}</span></summary>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
       <span className="text-[11px] uppercase tracking-[0.14em] text-slate-400">
         {t('bestFor')} {date} UTC
       </span>
@@ -68,6 +70,7 @@ export function BestNow() {
         })
       )}
       <CloseX onClick={() => dismiss('bestNow')} className="ml-auto" />
-    </div>
+      </div>
+    </details>
   )
 }

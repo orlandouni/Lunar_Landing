@@ -1,6 +1,8 @@
 // Lista flotante de sitios, agrupada: regiones Artemis III, misiones notables y coordenadas propias.
 // "Ahora" ordena según la fecha y hora elegidas; "Año" según todo 2028.
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { SiteCard } from './SiteCard'
+import { BestNow } from './BestNow'
 import type { TKey } from '../i18n'
 import { fmtHours, MISSION_H, scoreColor } from '../lib/visibility'
 import { CloseX } from './CloseX'
@@ -70,6 +72,11 @@ function AddCoord({ onDone }: { onDone: () => void }) {
 export function SiteList({ hover, setHover }: { hover: string | null; setHover: (id: string | null) => void }) {
   const { t, data, site, focus, selectSite, yearMetrics, scores, now, nowRanking, rankBy, setRankBy, removeCustomSite, dismissed, dismiss } = useApp()
   const [open, setOpen] = useState(true)
+  const [layer, setLayer] = useState<'sites' | 'details'>(focus ? 'details' : 'sites')
+  useEffect(() => {
+    setLayer(focus ? 'details' : 'sites')
+    if (focus) setOpen(true)
+  }, [site.id, focus])
   const [adding, setAdding] = useState(false)
   const best = nowRanking[0]
 
@@ -86,11 +93,19 @@ export function SiteList({ hover, setHover }: { hover: string | null; setHover: 
       .sort((a, b) => (rankBy === 'now' ? now[b.id].score - now[a.id].score : scores[b.id] - scores[a.id]))
 
   return (
-    <div className="glass pointer-events-auto absolute left-4 top-20 z-20 flex max-h-[calc(100vh-15rem)] w-[19rem] flex-col overflow-hidden">
+    <div className="glass pointer-events-auto absolute left-4 top-20 z-20 flex max-h-[calc(100dvh-16rem)] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden">
       <div className="flex items-center justify-between px-3 py-2">
-        <span className="text-[11px] uppercase tracking-[0.16em] text-slate-400">{t('sites')}</span>
+        <div className="flex gap-1" role="group" aria-label={t('exploreLayers')}>
+          {(['sites', 'details'] as const).map((id) => (
+            <button key={id} disabled={id === 'details' && !focus} aria-pressed={layer === id}
+              onClick={() => { setLayer(id); setOpen(true) }}
+              className={`rounded-lg px-2 py-1 text-[11px] uppercase tracking-wider transition disabled:opacity-30 ${layer === id ? 'bg-white/10 text-slate-100' : 'text-slate-400 hover:text-slate-100'}`}>
+              {t(id === 'sites' ? 'sites' : 'siteSummary')}
+            </button>
+          ))}
+        </div>
         <div className="flex items-center gap-1">
-          <div className="flex rounded-full bg-white/5 p-0.5 text-[11px]">
+          <div className={`${layer === 'sites' ? 'flex' : 'hidden'} rounded-full bg-white/5 p-0.5 text-[11px]`}>
             {(['now', 'year'] as const).map((r) => (
               <button
                 key={r}
@@ -101,13 +116,15 @@ export function SiteList({ hover, setHover }: { hover: string | null; setHover: 
               </button>
             ))}
           </div>
-          <button className="w-5 text-slate-500 hover:text-slate-200" onClick={() => setOpen(!open)} aria-label="toggle">
+          <button className="w-7 text-slate-500 hover:text-slate-200" onClick={() => setOpen(!open)} aria-label={t(open ? 'collapsePanel' : 'expandPanel')} aria-expanded={open}>
             {open ? '−' : '+'}
           </button>
         </div>
       </div>
-      {open && (
+      {open && layer === 'details' && <SiteCard />}
+      {open && layer === 'sites' && (
         <div className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-1.5">
+          <BestNow />
           {GROUPS.map(({ id: g, key }) => {
             const list = sorted(g)
             if (!list.length) return null
@@ -122,7 +139,7 @@ export function SiteList({ hover, setHover }: { hover: string | null; setHover: 
                     return (
                       <li key={s.id} className="group relative">
                         <button
-                          onClick={() => selectSite(s.id)}
+                          onClick={() => { selectSite(s.id); setLayer('details') }}
                           onMouseEnter={() => setHover(s.id)}
                           onMouseLeave={() => setHover(null)}
                           className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] transition ${g === 'custom' ? 'pr-7' : ''} ${
@@ -162,7 +179,7 @@ export function SiteList({ hover, setHover }: { hover: string | null; setHover: 
           })}
         </div>
       )}
-      {open && (
+      {open && layer === 'sites' && (
         <div className="border-t border-white/5">
           {adding ? (
             <AddCoord onDone={() => setAdding(false)} />

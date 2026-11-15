@@ -11,6 +11,8 @@ export function SkyNow() {
   const s = samples[i]
   const sunM = margin(s, 'sun', site.horizon)
   const sun = crossing(samples, site.horizon, i, 'sun')
+  const sunState = sunM > 0 ? 'sunVisible' : s.sunEl > 0 ? 'sunOccluded' : 'sunNight'
+  const angle = (value: number) => `${value > 0 ? '+' : value < 0 ? '−' : ''}${Math.abs(value).toFixed(2)}°`
   const earth = crossing(samples, site.horizon, i, 'earth')
 
   const row = (body: 'sun' | 'earth', c: { visible: boolean; hours: number | null }) => {
@@ -22,7 +24,7 @@ export function SkyNow() {
         <span className="min-w-0 truncate" style={{ color: c.visible ? color : 'rgba(255,255,255,.55)' }} title={t('countdownHint')}>
           {label}
         </span>
-        <span className="ml-auto whitespace-nowrap font-mono text-[13px] tabular-nums text-slate-100">
+        <span className="ml-auto whitespace-nowrap text-[13px] text-slate-100">
           {c.hours == null ? (c.visible ? t('neverSets') : t('neverRises')) : `${t('inShort')} ${fmtCountdown(c.hours)}`}
         </span>
       </div>
@@ -33,19 +35,18 @@ export function SkyNow() {
     <div>
       <div className="flex items-end justify-between gap-3">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.15em] text-slate-100/40">{t('sunElevation')}</div>
+          <div className="text-[10px] uppercase tracking-[0.15em] text-slate-400">{t('sunLocalElevation')}</div>
           <div className="font-mono text-3xl font-light tabular-nums" style={{ color: sunM > 0 ? C.sun : 'rgba(255,255,255,.5)' }}>
-            {s.sunEl >= 0 ? '+' : '−'}
-            {Math.abs(s.sunEl).toFixed(2)}°
+            {angle(sunM)}
           </div>
+          <span className={`mt-1 inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ${sunM > 0 ? 'border-sun/25 text-sun' : 'border-slate-500/30 text-slate-400'}`}>{t(sunState)}</span>
         </div>
-        <div className="pb-1 text-right font-mono text-[11px] leading-snug text-slate-100/45">
-          <div className={sunM > 0 ? 'text-sun/80' : ''}>
-            {Math.abs(sunM).toFixed(2)}° {sunM > 0 ? t('aboveRelief') : t('belowRelief')}
+        <div className="pb-1 text-right text-[11px] leading-snug text-slate-400">
+          <div title={t('geometricElevation')}>
+            <span className="font-mono tabular-nums">{angle(s.sunEl)}</span> {t('geometricShort')}
           </div>
           <div>
-            {t('earth')} {s.earthEl >= 0 ? '+' : '−'}
-            {Math.abs(s.earthEl).toFixed(2)}°
+            {t('earth')} <span className="font-mono tabular-nums">{angle(s.earthEl)}</span> {t('geometricShort')}
           </div>
         </div>
       </div>
