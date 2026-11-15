@@ -113,16 +113,33 @@ function SunLight({ dir }: { dir: THREE.Vector3 }) {
 
 function SunAndEarth({ site, sunDir, earthDir }: { site: THREE.Vector3; sunDir: THREE.Vector3; earthDir: THREE.Vector3 }) {
   const { t } = useApp()
+  const sunGlow = useMemo(() => {
+    const canvas = document.createElement('canvas')
+    canvas.width = canvas.height = 256
+    const context = canvas.getContext('2d')!
+    const glow = context.createRadialGradient(128, 128, 0, 128, 128, 128)
+    glow.addColorStop(0, 'rgba(255, 249, 225, 1)')
+    glow.addColorStop(0.12, 'rgba(255, 229, 158, 0.9)')
+    glow.addColorStop(0.25, 'rgba(255, 194, 87, 0.45)')
+    glow.addColorStop(0.5, 'rgba(255, 151, 51, 0.12)')
+    glow.addColorStop(1, 'rgba(255, 151, 51, 0)')
+    context.fillStyle = glow
+    context.fillRect(0, 0, 256, 256)
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.colorSpace = THREE.SRGBColorSpace
+    return texture
+  }, [])
+  useEffect(() => () => sunGlow.dispose(), [sunGlow])
   const sunPos = site.clone().addScaledVector(sunDir, SUN_DIST)
   const earthPos = site.clone().addScaledVector(earthDir, EARTH_DIST)
   return (
     <group>
       <mesh position={sunPos}>
         <sphereGeometry args={[SUN_R, 32, 16]} />
-        <meshBasicMaterial color="#fff3d1" toneMapped={false} />
+        <meshBasicMaterial color="#fff5d9" toneMapped={false} />
       </mesh>
       <sprite position={sunPos} scale={[SUN_R * 9, SUN_R * 9, 1]}>
-        <spriteMaterial color="#ffcf6b" transparent opacity={0.35} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <spriteMaterial map={sunGlow} transparent opacity={0.65} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
       </sprite>
       <mesh position={earthPos}>
         <sphereGeometry args={[EARTH_R, 32, 16]} />
