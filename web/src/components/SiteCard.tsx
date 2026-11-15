@@ -1,43 +1,32 @@
 // Tarjeta que aparece al elegir un sitio en la Luna: estado ahora, % del año y su horizonte.
-import { fmtHours, MISSION_H, runAround, SAFE_SLOPE } from '../lib/visibility'
-import { nowColor } from './colors'
+import { fmtCoord, fmtHours, MISSION_H, SAFE_SLOPE } from '../lib/visibility'
+import { CloseX } from './CloseX'
 import { useApp } from '../store'
+import { nowColor } from './colors'
+import { DataBadge } from './DataBadge'
 import { HorizonView } from './HorizonView'
-
-function Status({ on, label, sub, color }: { on: boolean; label: string; sub: string; color: string }) {
-  return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: on ? color : 'transparent', border: `1.5px solid ${color}` }} />
-      <span style={{ color: on ? color : 'rgba(255,255,255,.55)' }}>{label}</span>
-      <span className="ml-auto font-mono text-[11px] text-slate-100/40">{sub}</span>
-    </div>
-  )
-}
+import { SkyNow } from './SkyNow'
 
 export function SiteCard() {
-  const { t, site, focus, setFocus, flags, timeIndex, yearMetrics, setTab, now, nowRanking, data } = useApp()
+  const { t, site, focus, setFocus, yearMetrics, setTab, now, nowRanking, isCandidate, dismissed, dismiss } = useApp()
   if (!focus) return null
-  const f = flags[site.id]
-  const i = Math.min(timeIndex, f.sun.length - 1)
   const m = yearMetrics[site.id]
   const n = now[site.id]
+  const candidate = isCandidate(site.id)
   const rank = nowRanking.indexOf(site.id) + 1
-  const until = (arr: Uint8Array) => {
-    const r = runAround(arr, i)
-    return r.end === arr.length - 1 ? t('never') : `${t('until')} ${fmtHours(r.end - i + 1)}`
-  }
 
   return (
-    <aside className="glass pointer-events-auto absolute right-4 top-20 z-20 w-[360px] max-w-[calc(100vw-2rem)] p-4">
+    <aside className="glass pointer-events-auto absolute right-4 top-20 z-20 max-h-[calc(100vh-15rem)] w-[360px] max-w-[calc(100vw-2rem)] overflow-y-auto p-4">
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2 text-lg font-medium text-slate-100">
             <span className="h-3 w-3 rounded-full" style={{ background: nowColor(now[site.id]) }} />
             {site.name}
-            {rank === 1 && now[site.id].both && <span className="text-sm text-both">★</span>}
+            {candidate && rank === 1 && now[site.id].both && <span className="text-sm text-both">★</span>}
           </div>
+          {site.note && <div className="text-[11px] text-slate-100/50">{site.note}</div>}
           <div className="mt-0.5 font-mono text-[11px] text-slate-100/40">
-            {Math.abs(site.lat).toFixed(2)}°S {Math.abs(site.lon).toFixed(2)}°{site.lon >= 0 ? 'E' : 'W'}
+            {fmtCoord(site.lat, site.lon)}
             {site.elevM != null && ` · ${Math.round(site.elevM).toLocaleString()} m`}
           </div>
           {site.slopeDeg != null && (
@@ -45,28 +34,37 @@ export function SiteCard() {
               {t('slope')} {site.slopeDeg.toFixed(1)}° · {site.slopeDeg <= SAFE_SLOPE ? t('slopeOk') : t('slopeHigh')}
             </div>
           )}
+          <DataBadge site={site} />
         </div>
-        <button className="rounded-full px-2 text-slate-100/50 hover:bg-white/10 hover:text-slate-100" onClick={() => setFocus(false)} aria-label="Cerrar">
+        <button className="rounded-full px-2 text-slate-100/50 hover:bg-white/10 hover:text-slate-100" onClick={() => setFocus(false)} aria-label={t('close')}>
           ✕
         </button>
       </div>
 
-      {m.bothHours === 0 && <p className="mt-3 rounded-lg bg-red-500/15 px-3 py-2 text-xs text-red-200">{t(m.sunHours === 0 ? 'permShadow' : 'noBoth')}</p>}
+      {m.bothHours === 0 && !dismissed.has(`warn-${site.id}`) && (
+        <div className="mt-3 flex items-start gap-2 rounded-lg bg-red-500/15 px-3 py-2 text-xs text-red-200">
+          <p className="flex-1">{t(m.sunHours === 0 ? 'permShadow' : 'noBoth')}</p>
+          <CloseX onClick={() => dismiss(`warn-${site.id}`)} />
+        </div>
+      )}
 
-      <div className="mt-4 space-y-1.5">
-        <Status on={!!f.sun[i]} label={f.sun[i] ? t('sunUp') : t('sunDown')} sub={until(f.sun)} color="#d8b36a" />
-        <Status on={!!f.earth[i]} label={f.earth[i] ? t('commOk') : t('commLost')} sub={until(f.earth)} color="#7ea6d8" />
+      <div className="mt-4">
+        <SkyNow />
       </div>
 
       {/* Recomendación para la hora elegida */}
       <div className="mt-3 rounded-xl bg-white/[0.04] px-3 py-2 text-xs text-slate-400">
+        {candidate ? (
+          <div className="mb-1 flex justify-between">
+            <span>{t('rankAt')}</span>
+            <span className="font-mono text-slate-200">
+              {rank}º / {nowRanking.length}
+            </span>
+          </div>
+        ) : (
+          <div className="mb-1 text-[11px] text-slate-500">{t('notCandidate')}</div>
+        )}
         <div className="flex justify-between">
-          <span>{t('rankAt')}</span>
-          <span className="font-mono text-slate-200">
-            {rank}º / {data.sites.length}
-          </span>
-        </div>
-        <div className="mt-1 flex justify-between">
           <span>{t('windowNow')}</span>
           <span className="font-mono text-slate-200">
             {n.both ? (n.windowH >= MISSION_H ? `${fmtHours(MISSION_H)}+` : fmtHours(n.windowH)) : n.nextBothInH > 0 ? `${t('inShort')} ${fmtHours(n.nextBothInH)}` : '—'}

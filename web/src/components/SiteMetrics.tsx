@@ -1,9 +1,11 @@
 // Panel 3 · Métricas del sitio: estado ahora, % del año, rachas, código de barras del mes y mejor ventana.
 import { useMemo } from 'react'
 import { MONTHS } from '../i18n'
-import { fmtHours, runAround } from '../lib/visibility'
+import { fmtHours } from '../lib/visibility'
+import { CloseX } from './CloseX'
 import { useApp } from '../store'
 import { Explain } from './Explain'
+import { SkyNow } from './SkyNow'
 
 function Big({ label, value, color }: { label: string; value: number; color: string }) {
   return (
@@ -13,18 +15,6 @@ function Big({ label, value, color }: { label: string; value: number; color: str
         <span className="text-lg">%</span>
       </div>
       <div className="text-[11px] uppercase tracking-wider text-slate-500">{label}</div>
-    </div>
-  )
-}
-
-function Pill({ on, label, sub, color }: { on: boolean; label: string; sub: string; color: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: on ? color : 'transparent', border: `1.5px solid ${color}` }} />
-      <span className="text-sm" style={{ color: on ? color : '#94a3b8' }}>
-        {label}
-      </span>
-      <span className="font-mono text-[11px] text-slate-500">{sub}</span>
     </div>
   )
 }
@@ -44,7 +34,7 @@ const BC_W = 720
 const BC_ROW = 9
 
 export function SiteMetrics() {
-  const { site, data, timeIndex, setTimeIndex, setPlaying, yearMetrics, flags, t, mode, bestSiteId, lang } = useApp()
+  const { site, data, timeIndex, setTimeIndex, setPlaying, yearMetrics, flags, t, mode, bestSiteId, lang, dismissed, dismiss } = useApp()
   const f = flags[site.id]
   const times = data.times
   const i = Math.min(timeIndex, f.sun.length - 1)
@@ -67,11 +57,6 @@ export function SiteMetrics() {
   const fmtDate = (k: number) =>
     new Date(times[k]).toLocaleDateString(lang === 'es' ? 'es-MX' : 'en-US', { timeZone: 'UTC', day: 'numeric', month: 'short' })
 
-  const status = (arr: Uint8Array) => {
-    const r = runAround(arr, i)
-    return r.end === arr.length - 1 ? t('never') : `${t('until')} ${fmtHours(r.end - i + 1)}`
-  }
-
   const rows: { key: string; color: string; on: (k: number) => boolean }[] = [
     { key: 'sun', color: '#d8b36a', on: (k) => !!f.sun[k] },
     { key: 'earth', color: '#7ea6d8', on: (k) => !!f.earth[k] },
@@ -89,13 +74,15 @@ export function SiteMetrics() {
         )}
       </div>
 
-      {m.bothHours === 0 && (
-        <p className="mb-3 rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">{t(m.sunHours === 0 ? 'permShadow' : 'noBoth')}</p>
+      {m.bothHours === 0 && !dismissed.has(`warn-${site.id}`) && (
+        <div className="mb-3 flex items-start gap-2 rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+          <p className="flex-1">{t(m.sunHours === 0 ? 'permShadow' : 'noBoth')}</p>
+          <CloseX onClick={() => dismiss(`warn-${site.id}`)} />
+        </div>
       )}
 
-      <div className="mb-4 space-y-1">
-        <Pill on={!!f.sun[i]} label={f.sun[i] ? t('sunUp') : t('sunDown')} sub={status(f.sun)} color="#d8b36a" />
-        <Pill on={!!f.earth[i]} label={f.earth[i] ? t('commOk') : t('commLost')} sub={status(f.earth)} color="#7ea6d8" />
+      <div className="mb-4">
+        <SkyNow />
       </div>
 
       <div className="mb-1 text-[11px] text-slate-500">{t('year')}</div>

@@ -1,21 +1,13 @@
-// Pestañas Métricas y Comparar: hojas de vidrio sobre la Luna (la escena 3D sigue viva detrás).
-import type { ReactNode } from 'react'
+// Metrics and Compare tabs: glass sheets over the Moon (the 3D scene stays alive behind them).
 import { scoreColor } from '../lib/visibility'
 import { useApp } from '../store'
 import { About } from './About'
 import { Comparator } from './Comparator'
 import { HorizonView } from './HorizonView'
 import { MonthlyChart } from './MonthlyChart'
+import { Sheet } from './Sheet'
 import { SiteMetrics } from './SiteMetrics'
 import { VisibilityGantt } from './VisibilityGantt'
-
-function Sheet({ children }: { children: ReactNode }) {
-  return (
-    <div className="absolute inset-0 z-10 overflow-y-auto bg-black/60 px-4 pb-40 pt-20 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4">{children}</div>
-    </div>
-  )
-}
 
 export function MetricsPage() {
   const { data, site, setSiteId, yearMetrics, scores } = useApp()

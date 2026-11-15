@@ -1,4 +1,4 @@
-# Horizonte Sur · front (web/)
+# Kairos · front (web/)
 
 Vite + React + TypeScript + Tailwind. Tema oscuro de control de misión.
 
@@ -17,6 +17,14 @@ npm run build    # verifica tipos y genera dist/
 - **Para usar los reales**: copia todo lo de `data-pipeline/public/` a `web/public/data/` (queda `web/public/data/sites.json`, `web/public/data/samples/<id>.json`). Al recargar, la app los detecta sola y la etiqueta cambia a "JPL Horizons + LOLA".
 - Forzar uno u otro: crea `web/.env.local` con `VITE_DATA=mock` o `VITE_DATA=real`.
 
+**Sitios sin datos reales** (`src/data/synth.ts`). Las misiones del catálogo (`src/data/catalog.ts`) que falten en `public/data/` y las coordenadas que agrega el usuario se crean en el navegador con la misma forma que las reales:
+- Con datos reales cargados, se **estiman** desde las efemérides JPL del sitio real más cercano: la dirección del Sol es la misma en toda la Luna y la de la Tierra se corrige por paralaje; solo cambia el cielo local. Comparado con Horizons, el error es ≤ 0.01° en elevación (probado de Malapert a Apollo 11, Chang'e 4 y Mons Mouton).
+- El horizonte se calcula con el relieve LOLA del navegador (594 m) si la coordenada cae en 80°S–90°S; si no, es plano. Da 0–7 puntos de % más de Sol que el pipeline de 80 m, por eso se marca "Estimado".
+- Sin datos reales, se usa la geometría simulada de `mock.ts` (vale para cualquier latitud).
+- Para convertirlos en datos reales: `python run_all.py --lat … --lon …` (ver `data-pipeline/README.md`).
+
+Las coordenadas propias se guardan en el navegador (localStorage) y viajan en la URL: `#coord=-85.5,20,Mi%20cresta`.
+
 Formas (`src/types.ts`): `Site {id, name, lat, lon, horizon:number[360]}` y `Sample {t, sunAz, sunEl, earthAz, earthEl}`.
 Regla de visibilidad (`src/lib/visibility.ts`, igual que `build.py`): `visible = el > horizon[round(az) % 360]`.
 Las métricas (% Sol, % Tierra, % ambos, noche más larga, apagón más largo) se calculan en el navegador con la misma fórmula que `build.py`.
@@ -25,11 +33,14 @@ Las métricas (% Sol, % Tierra, % ambos, noche más larga, apagón más largo) s
 
 Al entrar se ve **la Luna en 3D, en el espacio, a pantalla completa**. Todo lo demás flota encima en paneles de vidrio:
 
-- **Arriba**: pestañas **Explorar · Métricas · Comparar**, botón **Guía** (explicaciones del modo Clase) y ES/EN.
+- **Arriba**: pestañas **Explore · Metrics · Compare · Plan trip**, botón **Guía** (explicaciones del modo Clase) y ES/EN.
 - **Abajo**: la **línea de tiempo** (2028). Al reproducirla se mueven la luz del Sol, las sombras del relieve, la Tierra y todos los datos.
-- **Explorar**: lista de los 9 sitios en semáforo (izquierda) y cámara Luna / Polo / Sitio (derecha). Al **elegir un sitio** (en la Luna o en la lista) la cámara vuela hacia él y aparece su **tarjeta**: Sol/Tierra ahora, % del año, horizonte 360° y botón a Métricas.
+- **Explorar**: lista de sitios agrupada (Artemis III · Misiones notables · Mis coordenadas) con **+ Agregar coordenada** (izquierda) y cámara Luna / Polo / Sitio (derecha). Al **elegir un sitio** (en la Luna o en la lista) la cámara vuela hacia él y aparece su **tarjeta**: elevación del Sol a la hora elegida, cuenta regresiva al ocaso (sunset) y al Earthset (o a su salida si están ocultos, con el minuto interpolado), % del año, horizonte 360° y botón a Métricas.
 - **Métricas**: el sitio a fondo (estado, %, rachas, código de barras hora a hora, mejor ventana, horizonte, mes a mes).
-- **Comparar**: ranking con peso Energía/Comunicación, visibilidad anual de los 9 sitios, fuentes.
+- **Comparar**: ranking con peso Energía/Comunicación y filtro por grupo, visibilidad anual de todos los sitios, fuentes.
+- **Plan trip**: solo se eligen la **llegada** y la **salida** en la Luna (UTC). Kairos ordena los sitios por toda la estancia: % de horas con Sol + Tierra, +20 si los hay al alunizar y +20 al despegar (`src/lib/plan.ts`). Muestra el mejor sitio, el mejor momento para despegar (la última hora con Sol + Tierra antes de la salida), la franja hora a hora de cada sitio y mejores fechas a ±15 días con la misma duración.
+- La interfaz está en **inglés** por defecto (botón ES/EN arriba). Los recuadros de información (mejores ahora, leyenda, avisos, explicaciones de la Guía) se pueden cerrar con ✕.
+- Solo las regiones **Artemis III** compiten por "mejor candidato" (★ y la franja de arriba); las misiones y coordenadas propias se comparan aparte.
 
 La escena 3D (`Globe3D.tsx`, three.js + react-three-fiber):
 - De lejos se ve la esfera con la textura LROC. Al acercarse al polo (< 2 600 km) aparece el **relieve LOLA real** (594 m/celda) con la curvatura lunar.

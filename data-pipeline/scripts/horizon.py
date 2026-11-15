@@ -97,23 +97,44 @@ def slope_deg(dem, lat, lon, half=160.0, n=5):
     return float(np.degrees(np.arctan(np.hypot(a, b))))
 
 
+def coverage(dem, lat, lon, max_km):
+    """Fracción de azimuts cuyo rayo completo (hasta max_km) cae dentro del DEM."""
+    az = np.arange(360, dtype=float)
+    plat, plon = destination(lat, lon, az, np.array([max_km * 1000.0]))
+    return float(np.mean(~np.isnan(dem.sample(plat.ravel(), plon.ravel()))))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dem", required=True)
     ap.add_argument("--max-km", type=float, default=150.0)
     ap.add_argument("--obs-height", type=float, default=2.0, help="altura del observador/panel sobre el suelo (m)")
+    ap.add_argument("--site", help="calcular solo este sitio y conservar los demás de horizons.json")
     args = ap.parse_args()
     dem = Dem(args.dem)
     sites = json.loads((HERE / "sites.json").read_text(encoding="utf-8"))["sites"]
-    res = {}
+    out = OUT / "horizons.json"
+    res = json.loads(out.read_text(encoding="utf-8")) if args.site and out.exists() else {}
+    if args.site:
+        sites = [s for s in sites if s["id"] == args.site]
+        if not sites:
+            raise SystemExit(f"Sitio desconocido: {args.site}")
     for s in sites:
-        h0, hz = horizon_for(dem, s["lat"], s["lon"], args.max_km, args.obs_height)
+        try:
+            h0, hz = horizon_for(dem, s["lat"], s["lon"], args.max_km, args.obs_height)
+        except ValueError:
+            # El DEM LOLA cubre solo 80°S–90°S. Fuera de él build.py usa horizonte plano (0°).
+            res.pop(s["id"], None)
+            print(f"  {s['name']:<22} fuera del DEM polar ({s['lat']:.2f}°): se usará horizonte plano")
+            continue
         sl = slope_deg(dem, s["lat"], s["lon"])
-        res[s["id"]] = {"elev_m": round(h0, 1), "slope_deg": round(sl, 1),
+        cov = coverage(dem, s["lat"], s["lon"], args.max_km)
+        res[s["id"]] = {"elev_m": round(h0, 1), "slope_deg": round(sl, 1), "coverage": round(cov, 2),
                         "horizon": [round(float(v), 3) for v in hz]}
         print(f"  {s['name']:<22} h={h0:8.0f} m  pendiente {sl:4.1f}°  horizonte min/med/max = "
-              f"{hz.min():.2f} / {np.median(hz):.2f} / {hz.max():.2f} deg")
-    (OUT / "horizons.json").write_text(json.dumps(res), encoding="utf-8")
+              f"{hz.min():.2f} / {np.median(hz):.2f} / {hz.max():.2f} deg"
+              + (f"  (solo {cov:.0%} de los azimuts dentro del DEM)" if cov < 0.99 else ""))
+    out.write_text(json.dumps(res), encoding="utf-8")
     print("-> horizons.json")
 
 

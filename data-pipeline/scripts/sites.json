@@ -9,7 +9,8 @@
       "basis": "PENDIENTE: estimado cerca del cráter Cabeus B; verificar en QuickMap",
       "lat0": -84.1,
       "lon0": -55.0,
-      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py",
+      "group": "artemis"
     },
     {
       "id": "haworth",
@@ -19,7 +20,8 @@
       "basis": "centro del cráter Haworth (Wikipedia 86.9S 4.0W)",
       "lat0": -86.9,
       "lon0": -4.0,
-      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py",
+      "group": "artemis"
     },
     {
       "id": "malapert-massif",
@@ -29,7 +31,8 @@
       "basis": "cima del macizo Malapert (al sur del cráter Malapert, Gazetteer 3603: -84.90, 12.90)",
       "lat0": -85.99,
       "lon0": 2.93,
-      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py",
+      "group": "artemis"
     },
     {
       "id": "mons-mouton-plateau",
@@ -39,7 +42,8 @@
       "basis": "meseta en la cima de Mons Mouton (estimado)",
       "lat0": -85.4,
       "lon0": 31.5,
-      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py",
+      "group": "artemis"
     },
     {
       "id": "mons-mouton",
@@ -49,7 +53,8 @@
       "basis": "Gazetteer 16070: -84.60, 31.00",
       "lat0": -84.6,
       "lon0": 31.0,
-      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py",
+      "group": "artemis"
     },
     {
       "id": "nobile-rim-1",
@@ -59,7 +64,8 @@
       "basis": "PENDIENTE: estimado mal ubicado; en Moon Trek queda junto a Leibnitz Beta Plateau. Cráter Nobile, Gazetteer 4321: -85.28, 53.27",
       "lat0": -86.45,
       "lon0": 53.27,
-      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py",
+      "group": "artemis"
     },
     {
       "id": "nobile-rim-2",
@@ -69,7 +75,8 @@
       "basis": "borde este del cráter Nobile (estimado)",
       "lat0": -85.0,
       "lon0": 68.0,
-      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py",
+      "group": "artemis"
     },
     {
       "id": "de-gerlache-rim-2",
@@ -79,7 +86,8 @@
       "basis": "borde del cráter de Gerlache, Gazetteer 1439: -88.50, -87.10, D=32 km (estimado)",
       "lat0": -88.2,
       "lon0": -66.0,
-      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py",
+      "group": "artemis"
     },
     {
       "id": "slater-plain",
@@ -89,7 +97,54 @@
       "basis": "cráter Slater (Wikipedia 88.08S 111.29E)",
       "lat0": -88.08,
       "lon0": 111.29,
-      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py"
+      "search": "punto con más horas de Sol+Tierra en 2028 y pendiente <= 8° dentro de 10 km de (lat0, lon0); malla 400 m; best_point.py",
+      "group": "artemis"
+    },
+    {
+      "id": "apollo-11",
+      "name": "Apollo 11",
+      "lat": 0.6741,
+      "lon": 23.473,
+      "group": "notable",
+      "note": "NASA · 1969",
+      "basis": "Tranquility Base, posición del módulo Eagle medida por LRO (NASA)"
+    },
+    {
+      "id": "change-4",
+      "name": "Chang'e 4",
+      "lat": -45.4446,
+      "lon": 177.5991,
+      "group": "notable",
+      "note": "CNSA · 2019",
+      "basis": "cráter Von Kármán, cara oculta (Di et al. 2019 / LROC)"
+    },
+    {
+      "id": "chandrayaan-3",
+      "name": "Chandrayaan-3",
+      "lat": -69.3733,
+      "lon": 32.3191,
+      "group": "notable",
+      "note": "ISRO · 2023",
+      "basis": "módulo Vikram, punto Statio Shiv Shakti (ISRO)"
+    },
+    {
+      "id": "slim",
+      "name": "SLIM",
+      "lat": -13.316,
+      "lon": 25.251,
+      "group": "notable",
+      "note": "JAXA · 2024",
+      "basis": "cerca del cráter Shioli, 13°18'57.6\"S 25°15'03.6\"E (JAXA)"
+    },
+    {
+      "id": "im-1",
+      "name": "Intuitive Machines IM-1",
+      "lat": -80.13,
+      "lon": 1.44,
+      "group": "notable",
+      "note": "Intuitive Machines · 2024",
+      "basis": "Odysseus cerca de Malapert A, 80.13°S 1.44°E (NASA/LRO)"
     }
-  ]
+  ],
+  "_grupos": "group: artemis = 9 regiones candidatas Artemis III; notable = misiones que alunizaron (coordenadas publicadas); custom = agregado con run_all.py --lat --lon"
 }

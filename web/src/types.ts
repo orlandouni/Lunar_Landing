@@ -11,6 +11,22 @@ export interface Site {
   lon0?: number
   horizon: number[] // 360 valores: elevación máx. del terreno en el azimut i (grados)
   horizonSource?: string
+  group?: SiteGroup
+  note?: string // misión: agencia y año
+  dataSource?: 'real' | 'estimated' | 'mock' // real = pipeline (JPL Horizons); estimated/mock = calculado en el navegador
+  refSiteId?: string // sitio real del que se tomaron las efemérides (si es estimado)
+}
+
+export type SiteGroup = 'artemis' | 'notable' | 'custom'
+
+/** Lo mínimo para crear un sitio: catálogo de misiones o coordenada propia */
+export interface SiteSpec {
+  id: string
+  name: string
+  lat: number
+  lon: number
+  group: SiteGroup
+  note?: string
 }
 
 export interface Sample {
@@ -52,5 +68,12 @@ export interface Dataset {
 }
 
 export type Mode = 'mission' | 'class' | 'explore'
-export type Tab = 'explore' | 'metrics' | 'compare'
+export type Tab = 'explore' | 'metrics' | 'compare' | 'plan'
+
+/** Trip planner inputs (kept in the store so they survive tab changes) */
+export interface PlanInput {
+  arrive: string // landing on the Moon, ISO UTC hour (e.g. 2028-09-07T00:00:00Z)
+  leave: string // liftoff from the Moon, ISO UTC hour
+  scope: 'artemis' | 'all'
+}
 export type Lang = 'es' | 'en'

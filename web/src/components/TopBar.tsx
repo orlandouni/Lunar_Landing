@@ -1,4 +1,4 @@
-// Barra superior flotante: marca, pestañas (Explorar / Métricas / Comparar), guía e idioma.
+// Floating top bar: brand, tabs (Explore / Metrics / Compare / Plan trip), guide and language.
 import type { TKey } from '../i18n'
 import { useApp } from '../store'
 import type { Tab } from '../types'
@@ -7,6 +7,7 @@ const TABS: { id: Tab; key: TKey }[] = [
   { id: 'explore', key: 'tabExplore' },
   { id: 'metrics', key: 'tabMetrics' },
   { id: 'compare', key: 'tabCompare' },
+  { id: 'plan', key: 'tabPlan' },
 ]
 
 export function TopBar() {

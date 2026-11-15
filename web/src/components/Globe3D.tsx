@@ -228,14 +228,20 @@ function SiteMarker({ site, r, color, selected, hovered, onPick, onHover, showLa
 }
 
 function SiteMarkers({ view, hover, setHover }: { view: View; hover: string | null; setHover: (id: string | null) => void }) {
-  const { data, site, focus, selectSite, yearMetrics, now, nowRanking, rankBy } = useApp()
+  const { data, site, focus, selectSite, yearMetrics, now, nowRanking, rankBy, isCandidate } = useApp()
   // Color: según la hora elegida (modo "Ahora") o según todo el año
   const colorOf = (id: string) => {
     if (rankBy === 'year') return semaphore(yearMetrics[id].bothPct)
     const [h, s, l] = nowHsl(now[id])
     return new THREE.Color().setHSL(h / 360, s / 100, l / 100)
   }
-  const best = rankBy === 'now' ? (now[nowRanking[0]].both ? nowRanking[0] : null) : [...data.sites].sort((a, b) => yearMetrics[b.id].bothPct - yearMetrics[a.id].bothPct)[0].id
+  // La estrella solo marca regiones Artemis (las que compiten como candidatas)
+  const best =
+    rankBy === 'now'
+      ? now[nowRanking[0]].both
+        ? nowRanking[0]
+        : null
+      : data.sites.filter((s) => isCandidate(s.id)).sort((a, b) => yearMetrics[b.id].bothPct - yearMetrics[a.id].bothPct)[0]?.id
   const { camera, controls } = useThree() as unknown as { camera: THREE.Camera; controls: OrbitControlsImpl | null }
   // De cerca se etiquetan todos; de lejos solo el elegido o el que está bajo el cursor
   const byView = (v: View) => (v === 'moon' ? LEVELS[LEVELS.length - 1] : v === 'pole' ? 10 : LEVELS[0])

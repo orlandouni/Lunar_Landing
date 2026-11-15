@@ -55,11 +55,12 @@ def main():
         h = hzs.get(s["id"])
         horizon = h["horizon"] if h else [0.0] * 360
         if not h:
-            print(f"AVISO: {s['id']} sin horizonte del DEM; se usa horizonte plano (0°)")
+            print(f"AVISO: {s['id']} sin horizonte del DEM (fuera de 80°S–90°S o sin calcular); se usa horizonte plano (0°)")
         out_sites.append({"id": s["id"], "name": s["name"], "lat": s["lat"], "lon": s["lon"],
                           "elevM": h["elev_m"] if h else None, "slopeDeg": h.get("slope_deg") if h else None,
                           "horizon": horizon,
-                          "horizonSource": "LOLA DEM" if h else "flat",
+                          "horizonSource": ("LOLA DEM" if h.get("coverage", 1) >= 0.99 else "LOLA DEM (parcial)") if h else "flat",
+                          "group": s.get("group", "artemis"), **({"note": s["note"]} if "note" in s else {}),
                           **({"lat0": s["lat0"], "lon0": s["lon0"]} if "lat0" in s else {})})
         f = DATA / "samples" / f"{s['id']}.json"
         if not f.exists():

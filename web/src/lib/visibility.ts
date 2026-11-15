@@ -116,9 +116,9 @@ export interface NowInfo {
   score: number // para ordenar: mayor = mejor candidato en este momento
 }
 
-export const MISSION_H = 168
+export const MISSION_H = 168 // 7 días: estancia típica en superficie de Artemis III (~6.5 d)
 /** Pendiente máxima habitual para aterrizar (grados) */
-export const SAFE_SLOPE = 8 // 7 días: estancia típica en superficie de Artemis III (~6.5 d)
+export const SAFE_SLOPE = 8
 
 export function nowInfo(f: Flags, i: number): NowInfo {
   const n = f.sun.length
@@ -138,4 +138,43 @@ export function nowInfo(f: Flags, i: number): NowInfo {
   // Primero los que tienen ambos ahora (más horas seguidas = mejor); luego los que los tendrán pronto
   const score = both(i) ? 1e6 + Math.min(windowH, MISSION_H) * 100 + next7Pct : nextBothInH >= 0 ? 1e5 - nextBothInH * 10 + next7Pct : next7Pct
   return { sun: f.sun[i] === 1, earth: f.earth[i] === 1, both: both(i), windowH, next7Pct, nextBothInH, score }
+}
+
+/** "85.98°S 1.61°E" */
+export function fmtCoord(lat: number, lon: number): string {
+  return `${Math.abs(lat).toFixed(2)}°${lat < 0 ? 'S' : 'N'} ${Math.abs(lon).toFixed(2)}°${lon >= 0 ? 'E' : 'W'}`
+}
+
+/** Elevación del astro sobre el relieve en la hora k (grados; > 0 = visible) */
+export function margin(s: Sample, body: 'sun' | 'earth', horizon: number[]): number {
+  const el = body === 'sun' ? s.sunEl : s.earthEl
+  const az = body === 'sun' ? s.sunAz : s.earthAz
+  return el - horizon[((Math.round(az) % 360) + 360) % 360]
+}
+
+/**
+ * Horas (con fracción) hasta que el astro cruce el relieve desde la hora i: ocaso si está visible, salida si no.
+ * Se interpola linealmente entre las dos horas del cruce. null = no cambia en lo que queda de los datos.
+ */
+export function crossing(samples: Sample[], horizon: number[], i: number, body: 'sun' | 'earth'): { visible: boolean; hours: number | null } {
+  let prev = margin(samples[i], body, horizon)
+  const visible = prev > 0
+  for (let k = i + 1; k < samples.length; k++) {
+    const m = margin(samples[k], body, horizon)
+    if (m > 0 !== visible) {
+      const frac = prev === m ? 1 : Math.min(1, Math.max(0, prev / (prev - m)))
+      return { visible, hours: k - 1 - i + frac }
+    }
+    prev = m
+  }
+  return { visible, hours: null }
+}
+
+/** Cuenta regresiva legible: "42 min", "5 h 07 min", "3 d 04 h" */
+export function fmtCountdown(h: number): string {
+  const min = Math.round(h * 60)
+  if (min < 60) return `${min} min`
+  if (min < 48 * 60) return `${Math.floor(min / 60)} h ${String(min % 60).padStart(2, '0')} min`
+  const hh = Math.round(h)
+  return `${Math.floor(hh / 24)} d ${String(hh % 24).padStart(2, '0')} h`
 }

@@ -1422,6 +1422,796 @@
      "longestNoCommHours": 1
     }
    }
+  },
+  "apollo-11": {
+   "total": {
+    "hours": 8785,
+    "sunHours": 4499,
+    "earthHours": 8785,
+    "bothHours": 4499,
+    "sunPct": 51.2,
+    "earthPct": 100.0,
+    "bothPct": 51.2,
+    "longestDarkHours": 355,
+    "longestNoCommHours": 0
+   },
+   "months": {
+    "2028-01": {
+     "hours": 744,
+     "sunHours": 356,
+     "earthHours": 744,
+     "bothHours": 356,
+     "sunPct": 47.8,
+     "earthPct": 100.0,
+     "bothPct": 47.8,
+     "longestDarkHours": 349,
+     "longestNoCommHours": 0
+    },
+    "2028-02": {
+     "hours": 696,
+     "sunHours": 356,
+     "earthHours": 696,
+     "bothHours": 356,
+     "sunPct": 51.1,
+     "earthPct": 100.0,
+     "bothPct": 51.1,
+     "longestDarkHours": 334,
+     "longestNoCommHours": 0
+    },
+    "2028-03": {
+     "hours": 744,
+     "sunHours": 370,
+     "earthHours": 744,
+     "bothHours": 370,
+     "sunPct": 49.7,
+     "earthPct": 100.0,
+     "bothPct": 49.7,
+     "longestDarkHours": 354,
+     "longestNoCommHours": 0
+    },
+    "2028-04": {
+     "hours": 720,
+     "sunHours": 366,
+     "earthHours": 720,
+     "bothHours": 366,
+     "sunPct": 50.8,
+     "earthPct": 100.0,
+     "bothPct": 50.8,
+     "longestDarkHours": 354,
+     "longestNoCommHours": 0
+    },
+    "2028-05": {
+     "hours": 744,
+     "sunHours": 391,
+     "earthHours": 744,
+     "bothHours": 391,
+     "sunPct": 52.6,
+     "earthPct": 100.0,
+     "bothPct": 52.6,
+     "longestDarkHours": 353,
+     "longestNoCommHours": 0
+    },
+    "2028-06": {
+     "hours": 720,
+     "sunHours": 367,
+     "earthHours": 720,
+     "bothHours": 367,
+     "sunPct": 51.0,
+     "earthPct": 100.0,
+     "bothPct": 51.0,
+     "longestDarkHours": 353,
+     "longestNoCommHours": 0
+    },
+    "2028-07": {
+     "hours": 744,
+     "sunHours": 391,
+     "earthHours": 744,
+     "bothHours": 391,
+     "sunPct": 52.6,
+     "earthPct": 100.0,
+     "bothPct": 52.6,
+     "longestDarkHours": 353,
+     "longestNoCommHours": 0
+    },
+    "2028-08": {
+     "hours": 744,
+     "sunHours": 390,
+     "earthHours": 744,
+     "bothHours": 390,
+     "sunPct": 52.4,
+     "earthPct": 100.0,
+     "bothPct": 52.4,
+     "longestDarkHours": 354,
+     "longestNoCommHours": 0
+    },
+    "2028-09": {
+     "hours": 720,
+     "sunHours": 366,
+     "earthHours": 720,
+     "bothHours": 366,
+     "sunPct": 50.8,
+     "earthPct": 100.0,
+     "bothPct": 50.8,
+     "longestDarkHours": 354,
+     "longestNoCommHours": 0
+    },
+    "2028-10": {
+     "hours": 744,
+     "sunHours": 390,
+     "earthHours": 744,
+     "bothHours": 390,
+     "sunPct": 52.4,
+     "earthPct": 100.0,
+     "bothPct": 52.4,
+     "longestDarkHours": 354,
+     "longestNoCommHours": 0
+    },
+    "2028-11": {
+     "hours": 720,
+     "sunHours": 366,
+     "earthHours": 720,
+     "bothHours": 366,
+     "sunPct": 50.8,
+     "earthPct": 100.0,
+     "bothPct": 50.8,
+     "longestDarkHours": 354,
+     "longestNoCommHours": 0
+    },
+    "2028-12": {
+     "hours": 744,
+     "sunHours": 389,
+     "earthHours": 744,
+     "bothHours": 389,
+     "sunPct": 52.3,
+     "earthPct": 100.0,
+     "bothPct": 52.3,
+     "longestDarkHours": 355,
+     "longestNoCommHours": 0
+    },
+    "2029-01": {
+     "hours": 1,
+     "sunHours": 1,
+     "earthHours": 1,
+     "bothHours": 1,
+     "sunPct": 100.0,
+     "earthPct": 100.0,
+     "bothPct": 100.0,
+     "longestDarkHours": 0,
+     "longestNoCommHours": 0
+    }
+   }
+  },
+  "change-4": {
+   "total": {
+    "hours": 8785,
+    "sunHours": 4336,
+    "earthHours": 0,
+    "bothHours": 0,
+    "sunPct": 49.4,
+    "earthPct": 0.0,
+    "bothPct": 0.0,
+    "longestDarkHours": 361,
+    "longestNoCommHours": 8785
+   },
+   "months": {
+    "2028-01": {
+     "hours": 744,
+     "sunHours": 390,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 52.4,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 354,
+     "longestNoCommHours": 744
+    },
+    "2028-02": {
+     "hours": 696,
+     "sunHours": 338,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 48.6,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 358,
+     "longestNoCommHours": 696
+    },
+    "2028-03": {
+     "hours": 744,
+     "sunHours": 384,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 51.6,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 360,
+     "longestNoCommHours": 744
+    },
+    "2028-04": {
+     "hours": 720,
+     "sunHours": 359,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 49.9,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 361,
+     "longestNoCommHours": 720
+    },
+    "2028-05": {
+     "hours": 744,
+     "sunHours": 370,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 49.7,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 360,
+     "longestNoCommHours": 744
+    },
+    "2028-06": {
+     "hours": 720,
+     "sunHours": 350,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 48.6,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 344,
+     "longestNoCommHours": 720
+    },
+    "2028-07": {
+     "hours": 744,
+     "sunHours": 354,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 47.6,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 329,
+     "longestNoCommHours": 744
+    },
+    "2028-08": {
+     "hours": 744,
+     "sunHours": 357,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 48.0,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 291,
+     "longestNoCommHours": 744
+    },
+    "2028-09": {
+     "hours": 720,
+     "sunHours": 359,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 49.9,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 253,
+     "longestNoCommHours": 720
+    },
+    "2028-10": {
+     "hours": 744,
+     "sunHours": 360,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 48.4,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 241,
+     "longestNoCommHours": 744
+    },
+    "2028-11": {
+     "hours": 720,
+     "sunHours": 359,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 49.9,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 207,
+     "longestNoCommHours": 720
+    },
+    "2028-12": {
+     "hours": 744,
+     "sunHours": 356,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 47.8,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 199,
+     "longestNoCommHours": 744
+    },
+    "2029-01": {
+     "hours": 1,
+     "sunHours": 0,
+     "earthHours": 0,
+     "bothHours": 0,
+     "sunPct": 0.0,
+     "earthPct": 0.0,
+     "bothPct": 0.0,
+     "longestDarkHours": 1,
+     "longestNoCommHours": 1
+    }
+   }
+  },
+  "chandrayaan-3": {
+   "total": {
+    "hours": 8785,
+    "sunHours": 4520,
+    "earthHours": 8785,
+    "bothHours": 4520,
+    "sunPct": 51.5,
+    "earthPct": 100.0,
+    "bothPct": 51.5,
+    "longestDarkHours": 369,
+    "longestNoCommHours": 0
+   },
+   "months": {
+    "2028-01": {
+     "hours": 744,
+     "sunHours": 370,
+     "earthHours": 744,
+     "bothHours": 370,
+     "sunPct": 49.7,
+     "earthPct": 100.0,
+     "bothPct": 49.7,
+     "longestDarkHours": 355,
+     "longestNoCommHours": 0
+    },
+    "2028-02": {
+     "hours": 696,
+     "sunHours": 341,
+     "earthHours": 696,
+     "bothHours": 341,
+     "sunPct": 49.0,
+     "earthPct": 100.0,
+     "bothPct": 49.0,
+     "longestDarkHours": 355,
+     "longestNoCommHours": 0
+    },
+    "2028-03": {
+     "hours": 744,
+     "sunHours": 367,
+     "earthHours": 744,
+     "bothHours": 367,
+     "sunPct": 49.3,
+     "earthPct": 100.0,
+     "bothPct": 49.3,
+     "longestDarkHours": 369,
+     "longestNoCommHours": 0
+    },
+    "2028-04": {
+     "hours": 720,
+     "sunHours": 351,
+     "earthHours": 720,
+     "bothHours": 351,
+     "sunPct": 48.8,
+     "earthPct": 100.0,
+     "bothPct": 48.8,
+     "longestDarkHours": 369,
+     "longestNoCommHours": 0
+    },
+    "2028-05": {
+     "hours": 744,
+     "sunHours": 378,
+     "earthHours": 744,
+     "bothHours": 378,
+     "sunPct": 50.8,
+     "earthPct": 100.0,
+     "bothPct": 50.8,
+     "longestDarkHours": 366,
+     "longestNoCommHours": 0
+    },
+    "2028-06": {
+     "hours": 720,
+     "sunHours": 360,
+     "earthHours": 720,
+     "bothHours": 360,
+     "sunPct": 50.0,
+     "earthPct": 100.0,
+     "bothPct": 50.0,
+     "longestDarkHours": 360,
+     "longestNoCommHours": 0
+    },
+    "2028-07": {
+     "hours": 744,
+     "sunHours": 393,
+     "earthHours": 744,
+     "bothHours": 393,
+     "sunPct": 52.8,
+     "earthPct": 100.0,
+     "bothPct": 52.8,
+     "longestDarkHours": 351,
+     "longestNoCommHours": 0
+    },
+    "2028-08": {
+     "hours": 744,
+     "sunHours": 400,
+     "earthHours": 744,
+     "bothHours": 400,
+     "sunPct": 53.8,
+     "earthPct": 100.0,
+     "bothPct": 53.8,
+     "longestDarkHours": 344,
+     "longestNoCommHours": 0
+    },
+    "2028-09": {
+     "hours": 720,
+     "sunHours": 380,
+     "earthHours": 720,
+     "bothHours": 380,
+     "sunPct": 52.8,
+     "earthPct": 100.0,
+     "bothPct": 52.8,
+     "longestDarkHours": 340,
+     "longestNoCommHours": 0
+    },
+    "2028-10": {
+     "hours": 744,
+     "sunHours": 406,
+     "earthHours": 744,
+     "bothHours": 406,
+     "sunPct": 54.6,
+     "earthPct": 100.0,
+     "bothPct": 54.6,
+     "longestDarkHours": 338,
+     "longestNoCommHours": 0
+    },
+    "2028-11": {
+     "hours": 720,
+     "sunHours": 378,
+     "earthHours": 720,
+     "bothHours": 378,
+     "sunPct": 52.5,
+     "earthPct": 100.0,
+     "bothPct": 52.5,
+     "longestDarkHours": 342,
+     "longestNoCommHours": 0
+    },
+    "2028-12": {
+     "hours": 744,
+     "sunHours": 395,
+     "earthHours": 744,
+     "bothHours": 395,
+     "sunPct": 53.1,
+     "earthPct": 100.0,
+     "bothPct": 53.1,
+     "longestDarkHours": 349,
+     "longestNoCommHours": 0
+    },
+    "2029-01": {
+     "hours": 1,
+     "sunHours": 1,
+     "earthHours": 1,
+     "bothHours": 1,
+     "sunPct": 100.0,
+     "earthPct": 100.0,
+     "bothPct": 100.0,
+     "longestDarkHours": 0,
+     "longestNoCommHours": 0
+    }
+   }
+  },
+  "slim": {
+   "total": {
+    "hours": 8785,
+    "sunHours": 4504,
+    "earthHours": 8785,
+    "bothHours": 4504,
+    "sunPct": 51.3,
+    "earthPct": 100.0,
+    "bothPct": 51.3,
+    "longestDarkHours": 356,
+    "longestNoCommHours": 0
+   },
+   "months": {
+    "2028-01": {
+     "hours": 744,
+     "sunHours": 356,
+     "earthHours": 744,
+     "bothHours": 356,
+     "sunPct": 47.8,
+     "earthPct": 100.0,
+     "bothPct": 47.8,
+     "longestDarkHours": 352,
+     "longestNoCommHours": 0
+    },
+    "2028-02": {
+     "hours": 696,
+     "sunHours": 355,
+     "earthHours": 696,
+     "bothHours": 355,
+     "sunPct": 51.0,
+     "earthPct": 100.0,
+     "bothPct": 51.0,
+     "longestDarkHours": 338,
+     "longestNoCommHours": 0
+    },
+    "2028-03": {
+     "hours": 744,
+     "sunHours": 371,
+     "earthHours": 744,
+     "bothHours": 371,
+     "sunPct": 49.9,
+     "earthPct": 100.0,
+     "bothPct": 49.9,
+     "longestDarkHours": 356,
+     "longestNoCommHours": 0
+    },
+    "2028-04": {
+     "hours": 720,
+     "sunHours": 365,
+     "earthHours": 720,
+     "bothHours": 365,
+     "sunPct": 50.7,
+     "earthPct": 100.0,
+     "bothPct": 50.7,
+     "longestDarkHours": 355,
+     "longestNoCommHours": 0
+    },
+    "2028-05": {
+     "hours": 744,
+     "sunHours": 390,
+     "earthHours": 744,
+     "bothHours": 390,
+     "sunPct": 52.4,
+     "earthPct": 100.0,
+     "bothPct": 52.4,
+     "longestDarkHours": 354,
+     "longestNoCommHours": 0
+    },
+    "2028-06": {
+     "hours": 720,
+     "sunHours": 367,
+     "earthHours": 720,
+     "bothHours": 367,
+     "sunPct": 51.0,
+     "earthPct": 100.0,
+     "bothPct": 51.0,
+     "longestDarkHours": 353,
+     "longestNoCommHours": 0
+    },
+    "2028-07": {
+     "hours": 744,
+     "sunHours": 391,
+     "earthHours": 744,
+     "bothHours": 391,
+     "sunPct": 52.6,
+     "earthPct": 100.0,
+     "bothPct": 52.6,
+     "longestDarkHours": 353,
+     "longestNoCommHours": 0
+    },
+    "2028-08": {
+     "hours": 744,
+     "sunHours": 391,
+     "earthHours": 744,
+     "bothHours": 391,
+     "sunPct": 52.6,
+     "earthPct": 100.0,
+     "bothPct": 52.6,
+     "longestDarkHours": 353,
+     "longestNoCommHours": 0
+    },
+    "2028-09": {
+     "hours": 720,
+     "sunHours": 368,
+     "earthHours": 720,
+     "bothHours": 368,
+     "sunPct": 51.1,
+     "earthPct": 100.0,
+     "bothPct": 51.1,
+     "longestDarkHours": 352,
+     "longestNoCommHours": 0
+    },
+    "2028-10": {
+     "hours": 744,
+     "sunHours": 392,
+     "earthHours": 744,
+     "bothHours": 392,
+     "sunPct": 52.7,
+     "earthPct": 100.0,
+     "bothPct": 52.7,
+     "longestDarkHours": 352,
+     "longestNoCommHours": 0
+    },
+    "2028-11": {
+     "hours": 720,
+     "sunHours": 367,
+     "earthHours": 720,
+     "bothHours": 367,
+     "sunPct": 51.0,
+     "earthPct": 100.0,
+     "bothPct": 51.0,
+     "longestDarkHours": 353,
+     "longestNoCommHours": 0
+    },
+    "2028-12": {
+     "hours": 744,
+     "sunHours": 390,
+     "earthHours": 744,
+     "bothHours": 390,
+     "sunPct": 52.4,
+     "earthPct": 100.0,
+     "bothPct": 52.4,
+     "longestDarkHours": 354,
+     "longestNoCommHours": 0
+    },
+    "2029-01": {
+     "hours": 1,
+     "sunHours": 1,
+     "earthHours": 1,
+     "bothHours": 1,
+     "sunPct": 100.0,
+     "earthPct": 100.0,
+     "bothPct": 100.0,
+     "longestDarkHours": 0,
+     "longestNoCommHours": 0
+    }
+   }
+  },
+  "im-1": {
+   "total": {
+    "hours": 8785,
+    "sunHours": 3478,
+    "earthHours": 8785,
+    "bothHours": 3478,
+    "sunPct": 39.6,
+    "earthPct": 100.0,
+    "bothPct": 39.6,
+    "longestDarkHours": 455,
+    "longestNoCommHours": 0
+   },
+   "months": {
+    "2028-01": {
+     "hours": 744,
+     "sunHours": 280,
+     "earthHours": 744,
+     "bothHours": 280,
+     "sunPct": 37.6,
+     "earthPct": 100.0,
+     "bothPct": 37.6,
+     "longestDarkHours": 324,
+     "longestNoCommHours": 0
+    },
+    "2028-02": {
+     "hours": 696,
+     "sunHours": 268,
+     "earthHours": 696,
+     "bothHours": 268,
+     "sunPct": 38.5,
+     "earthPct": 100.0,
+     "bothPct": 38.5,
+     "longestDarkHours": 317,
+     "longestNoCommHours": 0
+    },
+    "2028-03": {
+     "hours": 744,
+     "sunHours": 258,
+     "earthHours": 744,
+     "bothHours": 258,
+     "sunPct": 34.7,
+     "earthPct": 100.0,
+     "bothPct": 34.7,
+     "longestDarkHours": 356,
+     "longestNoCommHours": 0
+    },
+    "2028-04": {
+     "hours": 720,
+     "sunHours": 253,
+     "earthHours": 720,
+     "bothHours": 253,
+     "sunPct": 35.1,
+     "earthPct": 100.0,
+     "bothPct": 35.1,
+     "longestDarkHours": 370,
+     "longestNoCommHours": 0
+    },
+    "2028-05": {
+     "hours": 744,
+     "sunHours": 255,
+     "earthHours": 744,
+     "bothHours": 255,
+     "sunPct": 34.3,
+     "earthPct": 100.0,
+     "bothPct": 34.3,
+     "longestDarkHours": 404,
+     "longestNoCommHours": 0
+    },
+    "2028-06": {
+     "hours": 720,
+     "sunHours": 261,
+     "earthHours": 720,
+     "bothHours": 261,
+     "sunPct": 36.2,
+     "earthPct": 100.0,
+     "bothPct": 36.2,
+     "longestDarkHours": 412,
+     "longestNoCommHours": 0
+    },
+    "2028-07": {
+     "hours": 744,
+     "sunHours": 286,
+     "earthHours": 744,
+     "bothHours": 286,
+     "sunPct": 38.4,
+     "earthPct": 100.0,
+     "bothPct": 38.4,
+     "longestDarkHours": 429,
+     "longestNoCommHours": 0
+    },
+    "2028-08": {
+     "hours": 744,
+     "sunHours": 329,
+     "earthHours": 744,
+     "bothHours": 329,
+     "sunPct": 44.2,
+     "earthPct": 100.0,
+     "bothPct": 44.2,
+     "longestDarkHours": 415,
+     "longestNoCommHours": 0
+    },
+    "2028-09": {
+     "hours": 720,
+     "sunHours": 315,
+     "earthHours": 720,
+     "bothHours": 315,
+     "sunPct": 43.8,
+     "earthPct": 100.0,
+     "bothPct": 43.8,
+     "longestDarkHours": 405,
+     "longestNoCommHours": 0
+    },
+    "2028-10": {
+     "hours": 744,
+     "sunHours": 340,
+     "earthHours": 744,
+     "bothHours": 340,
+     "sunPct": 45.7,
+     "earthPct": 100.0,
+     "bothPct": 45.7,
+     "longestDarkHours": 404,
+     "longestNoCommHours": 0
+    },
+    "2028-11": {
+     "hours": 720,
+     "sunHours": 311,
+     "earthHours": 720,
+     "bothHours": 311,
+     "sunPct": 43.2,
+     "earthPct": 100.0,
+     "bothPct": 43.2,
+     "longestDarkHours": 409,
+     "longestNoCommHours": 0
+    },
+    "2028-12": {
+     "hours": 744,
+     "sunHours": 321,
+     "earthHours": 744,
+     "bothHours": 321,
+     "sunPct": 43.1,
+     "earthPct": 100.0,
+     "bothPct": 43.1,
+     "longestDarkHours": 423,
+     "longestNoCommHours": 0
+    },
+    "2029-01": {
+     "hours": 1,
+     "sunHours": 1,
+     "earthHours": 1,
+     "bothHours": 1,
+     "sunPct": 100.0,
+     "earthPct": 100.0,
+     "bothPct": 100.0,
+     "longestDarkHours": 0,
+     "longestNoCommHours": 0
+    }
+   }
   }
  }
 }

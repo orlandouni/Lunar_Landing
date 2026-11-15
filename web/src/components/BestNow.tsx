@@ -1,9 +1,10 @@
 // Mejores candidatos para la fecha y hora elegidas en la línea de tiempo.
 import { fmtHours, MISSION_H } from '../lib/visibility'
 import { useApp } from '../store'
+import { CloseX } from './CloseX'
 
 export function BestNow() {
-  const { t, data, now, nowRanking, selectSite, site, focus, timeIndex, lang } = useApp()
+  const { t, data, now, nowRanking, selectSite, site, focus, timeIndex, lang, dismissed, dismiss, restore } = useApp()
   const byId = Object.fromEntries(data.sites.map((s) => [s.id, s]))
   const withBoth = nowRanking.filter((id) => now[id].both)
   const top = withBoth.slice(0, 3)
@@ -16,6 +17,16 @@ export function BestNow() {
     hour12: false,
   })
   const win = (h: number) => (h >= MISSION_H ? `${fmtHours(MISSION_H)}+` : fmtHours(h))
+
+  if (dismissed.has('bestNow'))
+    return (
+      <button
+        className="glass pointer-events-auto absolute left-1/2 top-[72px] z-20 -translate-x-1/2 px-3 py-1 text-xs text-slate-400 hover:text-slate-100"
+        onClick={() => restore('bestNow')}
+      >
+        <span className="text-both">★</span> {t('bestFor')} …
+      </button>
+    )
 
   return (
     <div className="glass pointer-events-auto absolute left-1/2 top-[72px] z-20 flex max-w-[min(860px,calc(100vw-2rem))] -translate-x-1/2 flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2">
@@ -56,6 +67,7 @@ export function BestNow() {
           )
         })
       )}
+      <CloseX onClick={() => dismiss('bestNow')} className="ml-auto" />
     </div>
   )
 }

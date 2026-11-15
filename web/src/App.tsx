@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { MoonCanvas, type View } from './components/Globe3D'
 import { BestNow } from './components/BestNow'
+import { CloseX } from './components/CloseX'
 import { ComparePage, MetricsPage } from './components/Pages'
+import { PlanPage } from './components/PlanPage'
 import { SiteCard } from './components/SiteCard'
 import { SiteList } from './components/SiteList'
 import { Timeline } from './components/Timeline'
@@ -36,7 +38,7 @@ function CameraButtons({ view, go }: { view: View; go: (v: View) => void }) {
 }
 
 function Shell() {
-  const { tab, focus, site, mode, t } = useApp()
+  const { tab, focus, site, mode, t, dismissed, dismiss } = useApp()
   const [view, setView] = useState<View>(() => {
     const v = new URLSearchParams(window.location.hash.slice(1)).get('view')
     return v === 'site' || v === 'pole' ? v : 'moon'
@@ -67,13 +69,17 @@ function Shell() {
           <SiteList hover={hover} setHover={setHover} />
           <SiteCard />
           <CameraButtons view={view} go={go} />
-          {mode === 'class' && (
-            <p className="glass pointer-events-none absolute bottom-36 left-4 z-20 max-w-md p-3 text-sm leading-relaxed text-amber-100/90">{t('explainGlobe')}</p>
+          {mode === 'class' && !dismissed.has('explainGlobe') && (
+            <div className="glass pointer-events-auto absolute bottom-36 left-4 z-20 flex max-w-md items-start gap-2 p-3 text-sm leading-relaxed text-amber-100/90">
+              <p className="flex-1">{t('explainGlobe')}</p>
+              <CloseX onClick={() => dismiss('explainGlobe')} />
+            </div>
           )}
         </>
       )}
       {tab === 'metrics' && <MetricsPage />}
       {tab === 'compare' && <ComparePage />}
+      {tab === 'plan' && <PlanPage />}
       <Timeline />
     </div>
   )
@@ -91,7 +97,7 @@ export default function App() {
   if (!data)
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black font-mono text-sm tracking-widest text-slate-100/50">
-        HORIZONTE SUR · cargando la Luna…
+        KAIROS · loading the Moon…
       </div>
     )
 

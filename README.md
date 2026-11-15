@@ -1,6 +1,6 @@
 # Lunar_Landing
 
-# Horizonte Sur · NASA Space Apps 2026
+# Kairos · NASA Space Apps 2026 (equipo Horizonte Sur)
 
 Reto **Lunar Landing Site Navigator**: comparar sitios de alunizaje del polo sur lunar según horas de Sol y ventanas de comunicación directa con la Tierra.
 

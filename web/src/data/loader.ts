@@ -2,7 +2,9 @@
 // si no, usa los simulados. Pasar a reales = copiar data-pipeline/public/* a web/public/data/.
 // Para forzar uno u otro: VITE_DATA=mock o VITE_DATA=real en web/.env.local
 import type { Dataset, Sample, Site, Terrain } from '../types'
+import { NOTABLE, NOTABLE_IDS } from './catalog'
 import { buildMockDataset } from './mock'
+import { withSites } from './synth'
 
 const BASE = `${import.meta.env.BASE_URL}data`
 
@@ -38,7 +40,14 @@ async function loadReal(): Promise<Dataset> {
   const samples: Record<string, Sample[]> = Object.fromEntries(entries.map(([id, v]) => [id, v.filter((x) => x.t.startsWith(year ?? ''))]))
   const withData = sites.filter((s) => samples[s.id].length > 0)
   if (withData.length === 0) throw new Error('no hay samples reales')
-  return { source: 'real', terrain: await loadTerrain(), sites: withData, samples, times: samples[withData[0].id].map((x) => x.t) }
+  const tagged: Site[] = withData.map((s) => ({
+    ...s,
+    group: s.group ?? (NOTABLE_IDS.has(s.id) ? 'notable' : 'artemis'),
+    dataSource: 'real',
+  }))
+  const data: Dataset = { source: 'real', terrain: await loadTerrain(), sites: tagged, samples, times: samples[withData[0].id].map((x) => x.t) }
+  // Misiones del catálogo que el pipeline aún no generó: se estiman en el navegador (misma forma)
+  return withSites(data, NOTABLE)
 }
 
 export async function loadDataset(): Promise<Dataset> {
@@ -48,7 +57,7 @@ export async function loadDataset(): Promise<Dataset> {
     return await loadReal()
   } catch (e) {
     if (mode === 'real') throw e
-    console.info('[Horizonte Sur] Usando datos simulados:', (e as Error).message)
+    console.info('[Kairos] Using simulated data:', (e as Error).message)
     return { ...buildMockDataset(), terrain: await loadTerrain() }
   }
 }

@@ -1,4 +1,4 @@
-# Horizonte Sur · pipeline de datos
+# Kairos · pipeline de datos
 
 > Carpeta `data-pipeline/` del repo. Corre en tu laptop (la nube no llega a los servidores de NASA). Todo lo que genera queda dentro de esta carpeta: `raw/` y `samples/` se ignoran en git; `horizons.json` y `public/` sí se suben para que el front los use.
 
@@ -12,8 +12,30 @@ Requiere Python 3.10+ e internet (los servidores de NASA).
 cd scripts
 pip install -r requirements.txt
 python run_all.py --quick   # Malapert, 24 h, horizonte plano. Tarda segundos.
-python run_all.py           # 9 sitios × 8 784 h de 2028 + DEM LOLA (descarga 181 MB una vez). ~10–20 min.
+python run_all.py           # todos los sitios de sites.json × 8 784 h de 2028 + DEM LOLA (descarga 181 MB una vez). ~10–20 min.
+python run_all.py --search  # además reubica cada región Artemis en su mejor punto (best_point.py, ~10 min más)
 ```
+
+### Un sitio nuevo o uno solo
+
+```bash
+python run_all.py --lat -85.5 --lon 20 --name "Mi cresta"   # agrega la coordenada a sites.json y genera solo sus datos
+python run_all.py --site apollo-11                          # regenera solo un sitio que ya está en sites.json
+```
+
+`--lat/--lon` en grados decimales: sur y oeste negativos (la longitud también acepta 0–360). El sitio entra a `sites.json` con `group: "custom"` y un id `custom-<nombre>`; volver a correrlo con el mismo nombre lo actualiza. Solo se consulta Horizons para ese sitio (2 consultas, ~1 min), se calcula su horizonte y `build.py` rehace `public/`. Después hay que copiar `public/*` a `web/public/data/`.
+
+En la app también se pueden agregar coordenadas sin correr nada: se estiman en el navegador (ver `web/README.md`) y se marcan como "Estimado". Correr este comando las convierte en datos reales.
+
+### Grupos de sitios (`group` en `sites.json`)
+
+| Grupo | Sitios | Notas |
+|---|---|---|
+| `artemis` | las 9 regiones candidatas Artemis III | Las únicas que compiten por "mejor candidato" en la app y las únicas que mueve `best_point.py`. |
+| `notable` | Apollo 11, Chang'e 4, Chandrayaan-3, SLIM, Intuitive Machines IM-1 | Coordenadas publicadas de cada misión (fuente en `basis`); `note` = agencia y año. |
+| `custom` | lo agregado con `--lat --lon` | |
+
+**Fuera del polo**: el DEM LOLA que usamos cubre solo 80°S–90°S. Para un sitio fuera de esa zona (Apollo 11, Chang'e 4, Chandrayaan-3, SLIM) `horizon.py` lo avisa y `build.py` usa horizonte plano (0°, `horizonSource: "flat"`); las posiciones del Sol y la Tierra sí son de Horizons. IM-1 (80.13°S) queda en el borde: solo el 51 % de los azimuts caen dentro del DEM (`horizonSource: "LOLA DEM (parcial)"`). Para mejorar esto habría que agregar un DEM global (p. ej. LOLA 118 m/px).
 
 Las respuestas de Horizons se guardan en `raw/horizons/`, así que si se corta se puede volver a correr sin repetir descargas.
 
@@ -21,7 +43,7 @@ Las respuestas de Horizons se guardan en `raw/horizons/`, así que si se corta s
 
 | Archivo | Forma |
 |---|---|
-| `sites.json` | `Site[]` = `{id, name, lat, lon, elevM, horizon: number[360], horizonSource}` |
+| `sites.json` | `Site[]` = `{id, name, lat, lon, elevM, slopeDeg, horizon: number[360], horizonSource, group, note?, lat0?, lon0?}` |
 | `samples/<id>.json` | `Sample[]` = `{t, sunAz, sunEl, earthAz, earthEl}` (t ISO UTC, horario) |
 | `terrain/height.bin` + `meta.json` | Relieve LOLA del polo sur para el globo 3D: Int16 N×N (metros sobre R), promedio por bloques del DEM (`terrain.py`, 1024² ≈ 594 m/celda) |
 | `summary.json` | por sitio: `total` y `months["2028-01"]` con `sunPct, earthPct, bothPct, sunHours, earthHours, bothHours, longestDarkHours, longestNoCommHours` |
@@ -40,7 +62,7 @@ Regla de visibilidad: `visible = el > horizon[Math.round(az) % 360]`. Se evalúa
 
 ## Coordenadas de los sitios
 
-NASA publica las 9 regiones solo como zonas en un mapa, sin coordenadas de centro. Los puntos de `scripts/sites.json` son **aproximaciones** derivadas de la feature IAU más cercana; el campo `basis` explica cada una. "Peak near Cabeus B", "Mons Mouton Plateau", "Nobile Rim 2" y "de Gerlache Rim 2" son estimados y conviene afinarlos en LROC QuickMap. Si se edita `sites.json`, hay que volver a correr `run_all.py`.
+NASA publica las 9 regiones solo como zonas en un mapa, sin coordenadas de centro. En `scripts/sites.json`, `lat0/lon0` es la aproximación original (feature IAU más cercana; `basis` explica cada una) y `lat/lon` el punto elegido por `best_point.py` en 10 km. Haworth sigue sin Sol + Tierra: su punto original es el centro de un cráter de ~50 km y en 10 km no se llega al borde; conviene ubicar la región real en LROC QuickMap. Si se edita `sites.json`, hay que volver a correr `run_all.py`.
 
 ## Fuentes (citar en la entrega)
 

@@ -1,25 +1,18 @@
 // Datos SIMULADOS con la misma forma que los reales. Geometría aproximada, solo para desarrollar la UI.
+// Sirve para cualquier coordenada (no solo el polo): se simula el punto subsolar y el sub-terrestre
+// en el marco fijo a la Luna y se pasan al cielo local del sitio.
 import type { Dataset, Sample, Site } from '../types'
-
-const SITES: Pick<Site, 'id' | 'name' | 'lat' | 'lon'>[] = [
-  { id: 'peak-near-cabeus-b', name: 'Peak near Cabeus B', lat: -84.1, lon: -55.0 },
-  { id: 'haworth', name: 'Haworth', lat: -86.9, lon: -4.0 },
-  { id: 'malapert-massif', name: 'Malapert Massif', lat: -85.99, lon: 2.93 },
-  { id: 'mons-mouton-plateau', name: 'Mons Mouton Plateau', lat: -85.4, lon: 31.5 },
-  { id: 'mons-mouton', name: 'Mons Mouton', lat: -84.6, lon: 31.0 },
-  { id: 'nobile-rim-1', name: 'Nobile Rim 1', lat: -86.45, lon: 53.27 },
-  { id: 'nobile-rim-2', name: 'Nobile Rim 2', lat: -85.0, lon: 68.0 },
-  { id: 'de-gerlache-rim-2', name: 'de Gerlache Rim 2', lat: -88.2, lon: -66.0 },
-  { id: 'slater-plain', name: 'Slater Plain', lat: -88.08, lon: 111.29 },
-]
+import { ARTEMIS, NOTABLE } from './catalog'
 
 const START = Date.UTC(2028, 0, 1)
 const HOURS = 8784 // 2028 es bisiesto
 const SYNODIC = 29.530589 * 24
-const DRACONIC = 346.62 * 24 // ciclo de la elevación solar vista desde el polo
+const DRACONIC = 346.62 * 24 // ciclo de la latitud subsolar (±1.54°)
 const LIB_LAT = 27.212 * 24
 const LIB_LON = 27.5545 * 24
 const D = Math.PI / 180
+const R_KM = 1737.4
+const EARTH_KM = 384400
 const mod = (a: number, m: number) => ((a % m) + m) % m
 
 function rng(seed: number) {
@@ -40,20 +33,32 @@ function mockHorizon(seed: number): number[] {
   })
 }
 
-function mockSamples(site: { lat: number; lon: number }): Sample[] {
-  const colat = 90 + site.lat
+const unit = (lat: number, lon: number) => [Math.cos(lat * D) * Math.cos(lon * D), Math.cos(lat * D) * Math.sin(lon * D), Math.sin(lat * D)]
+
+/** Azimut (desde el Norte hacia el Este) y elevación de la dirección v vista desde (lat, lon) */
+function azEl(v: number[], lat: number, lon: number): [number, number] {
+  const sl = Math.sin(lat * D)
+  const cl = Math.cos(lat * D)
+  const so = Math.sin(lon * D)
+  const co = Math.cos(lon * D)
+  const e = -so * v[0] + co * v[1]
+  const n = -sl * co * v[0] - sl * so * v[1] + cl * v[2]
+  const u = cl * co * v[0] + cl * so * v[1] + sl * v[2]
+  const len = Math.hypot(e, n, u)
+  return [mod(Math.atan2(e, n) / D, 360), Math.asin(u / len) / D]
+}
+
+export function mockSamplesAt(site: { lat: number; lon: number }): Sample[] {
+  const p = unit(site.lat, site.lon).map((x) => x * R_KM)
   const out: Sample[] = []
   for (let h = 0; h < HOURS; h++) {
-    // Sol: una vuelta en azimut por mes sinódico; elevación ±1.54° por el ciclo anual
-    const sunLon = mod(180 - (360 * h) / SYNODIC, 360)
-    const dec = 1.54 * Math.sin((2 * Math.PI * h) / DRACONIC)
-    const sunAz = mod(sunLon - site.lon, 360)
-    const sunEl = colat * Math.cos(sunAz * D) - dec
-    // Tierra: casi fija en el cielo, se mece por la libración
-    const eLon = 7.9 * Math.sin((2 * Math.PI * h) / LIB_LON)
-    const eLat = 6.7 * Math.sin((2 * Math.PI * h) / LIB_LAT)
-    const earthAz = mod(eLon - site.lon, 360)
-    const earthEl = colat * Math.cos(earthAz * D) - eLat
+    // Sol: el punto subsolar da una vuelta por mes sinódico; su latitud oscila ±1.54°
+    const sun = unit(1.54 * Math.sin((2 * Math.PI * h) / DRACONIC), mod(180 - (360 * h) / SYNODIC, 360))
+    // Tierra: casi fija sobre (0°, 0°), se mece por la libración
+    const se = unit(6.7 * Math.sin((2 * Math.PI * h) / LIB_LAT), 7.9 * Math.sin((2 * Math.PI * h) / LIB_LON))
+    const earth = se.map((x, k) => x * EARTH_KM - p[k])
+    const [sunAz, sunEl] = azEl(sun, site.lat, site.lon)
+    const [earthAz, earthEl] = azEl(earth, site.lat, site.lon)
     out.push({
       t: new Date(START + h * 3600e3).toISOString().slice(0, 19) + 'Z',
       sunAz: +sunAz.toFixed(2),
@@ -66,13 +71,15 @@ function mockSamples(site: { lat: number; lon: number }): Sample[] {
 }
 
 export function buildMockDataset(): Dataset {
-  const sites: Site[] = SITES.map((s, i) => ({
+  const sites: Site[] = [...ARTEMIS, ...NOTABLE].map((s, i) => ({
     ...s,
     elevM: null,
-    horizon: mockHorizon(1000 + i * 77),
-    horizonSource: 'mock',
+    // horizonte inventado en el polo; plano en las misiones de latitudes medias
+    horizon: s.group === 'artemis' ? mockHorizon(1000 + i * 77) : new Array(360).fill(0),
+    horizonSource: s.group === 'artemis' ? 'mock' : 'flat',
+    dataSource: 'mock',
   }))
   const samples: Record<string, Sample[]> = {}
-  for (const s of sites) samples[s.id] = mockSamples(s)
+  for (const s of sites) samples[s.id] = mockSamplesAt(s)
   return { source: 'mock', terrain: null, sites, samples, times: samples[sites[0].id].map((x) => x.t) }
 }

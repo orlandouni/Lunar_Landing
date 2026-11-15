@@ -131,6 +131,8 @@ def main():
     cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
     report = []
     for s in cfg["sites"]:
+        if s.get("group", "artemis") != "artemis":
+            continue  # solo se reubican las regiones Artemis; misiones y sitios propios quedan donde están
         lat0, lon0 = s.get("lat0", s["lat"]), s.get("lon0", s["lon"])
         f = DATA / "samples" / f"{s['id']}.json"
         smp = json.loads(f.read_text(encoding="utf-8"))
